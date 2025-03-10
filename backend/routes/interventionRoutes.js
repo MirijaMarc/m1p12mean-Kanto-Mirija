@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  createIntervention,
+  newIntervention,
   getInterventions,
   getInterventionById,
   updateIntervention,
@@ -9,7 +9,7 @@ const {
 
 const router = express.Router();
 
-router.post("/", createIntervention);
+router.post("/", newIntervention);
 router.get("/", getInterventions);
 router.get("/:id", getInterventionById);
 router.put("/:id", updateIntervention);

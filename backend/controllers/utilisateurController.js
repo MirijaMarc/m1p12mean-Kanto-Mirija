@@ -59,12 +59,12 @@ const connexion = async (req, res) => {
     if (!motDePasseValide) {
       return res.status(401).json({
         statut: "error",
-        message: "Email ou mot de passe incorrect",
+        message: "Mot de passe incorrect",
         data: null,
       });
     }
 
-    const token = jwt.generateToken(utilisateur._id);
+    const token = generateToken(utilisateur._id);
 
     res.status(200).json({
       statut: "success",

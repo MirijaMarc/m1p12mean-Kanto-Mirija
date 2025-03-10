@@ -3,13 +3,14 @@ const mongoose = require("mongoose");
 const IntervationSchema = new mongoose.Schema(
   {
     dateIntervention: { type: Date, required: true },
-    client: {
+    clientId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Utilisateur",
       required: true,
     },
+    description: { type: String },
     voiture: { type: Object, required: true },
-    prestationId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Prestation" }],
+    prestationsId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Prestation", required: true }],
     statut: { type: Number, required: true },
     deletedAt: { type: Date, default: null },
   },
