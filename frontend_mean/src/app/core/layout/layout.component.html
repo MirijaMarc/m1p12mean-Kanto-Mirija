@@ -1,0 +1,90 @@
+<div class="flex h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-lg flex flex-col">
+    <!-- Logo & Nom -->
+        <div class="p-1 flex items-center justify-center border-b border-gray-200">
+        <img src="assets/img/logo.png" alt="Logo" class="h-16">
+        <h2 class="text-xl font-semibold text-gray-700">Auto Manage</h2>
+      </div>
+  
+      <!-- Navigation -->
+      <nav class="flex-1 mt-6">
+        <ul>
+          <li routerLink="/dashboard" routerLinkActive="active-link" class="p-6 hover:bg-gray-200 transition rounded cursor-pointer">
+            <a class="flex items-center gap-3">
+              <fa-icon [icon]="faDashboard" class="text-blue-500"></fa-icon> Tableau de bord
+            </a>
+          </li>
+          <li routerLink="/intervention" routerLinkActive="active-link" class="p-6 hover:bg-gray-200 transition rounded cursor-pointer">
+            <a class="flex items-center gap-3">
+              <fa-icon [icon]="faRendezVous" class="text-green-500"></fa-icon> Interventions
+            </a>
+          </li>
+          <li routerLink="/calendrier" routerLinkActive="active-link" class="p-6 hover:bg-gray-200 transition rounded cursor-pointer">
+            <a class="flex items-center gap-3">
+              <fa-icon [icon]="faCalendrier" class="text-yellow-500"></fa-icon> Calendrier
+            </a>
+          </li>
+          <li routerLink="/notifications" routerLinkActive="active-link" class="p-6 hover:bg-gray-200 transition rounded cursor-pointer">
+            <a class="flex items-center gap-3">
+              <fa-icon [icon]="faNotifications" class="text-red-500"></fa-icon> Notifications
+            </a>
+          </li>
+  
+          <!-- Menu Déroulant Utilitaires -->
+          <li class="p-6 hover:bg-gray-200 transition rounded cursor-pointer" (click)="toggleDropdown()">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <fa-icon [icon]="faTools" class="text-gray-500"></fa-icon> Utilitaires
+              </div>
+              <fa-icon [icon]="dropdownOpen ? faChevronUp : faChevronDown"></fa-icon>
+            </div>
+          </li>
+          <ul *ngIf="dropdownOpen" class="ml-6 mt-2 space-y-2 border-l border-gray-300 pl-4 transition-all duration-300">
+            <li class="p-2 hover:bg-gray-100 rounded">
+              <a routerLink="/mecanicien" routerLinkActive="active-link" class="flex items-center gap-3">
+                <fa-icon [icon]="faMecaniciens" class="text-indigo-500"></fa-icon> Mécaniciens
+              </a>
+            </li>
+            <li class="p-2 hover:bg-gray-100 rounded">
+              <a routerLink="/client" routerLinkActive="active-link" class="flex items-center gap-3">
+                <fa-icon [icon]="faClients" class="text-blue-500"></fa-icon> Clients
+              </a>
+            </li>
+            <li class="p-2 hover:bg-gray-100 rounded">
+              <a routerLink="/prestation" routerLinkActive="active-link" class="flex items-center gap-3">
+                <fa-icon [icon]="faPrestations" class="text-purple-500"></fa-icon> Prestations
+              </a>
+            </li>
+            <li class="p-2 hover:bg-gray-100 rounded">
+              <a routerLink="/voiture" routerLinkActive="active-link" class="flex items-center gap-3">
+                <fa-icon [icon]="faVoitures" class="text-orange-500"></fa-icon> Voitures
+              </a>
+            </li>
+          </ul>
+        </ul>
+      </nav>
+    </aside>
+  
+    <!-- Main Content -->
+    <div class="flex flex-col flex-1">
+      <!-- Header -->
+      <header class="bg-white shadow-md p-4 flex justify-between items-center">
+        <h1 class="text-xl font-semibold"></h1>
+        <div class="flex items-center gap-4">
+          <span class="text-gray-700 font-medium">Utilisateur</span>
+            <!-- Ajout de l'image -->
+            <img src="assets/img/user.png" alt="Utilisateur" class="w-10 h-10 rounded-full object-cover">
+          <button class="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition">
+            <fa-icon [icon]="faSignOut" class="text-gray-700"></fa-icon>
+          </button>
+        </div>
+      </header>
+  
+      <!-- Page Content -->
+      <main class="p-6 flex-1">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+  
