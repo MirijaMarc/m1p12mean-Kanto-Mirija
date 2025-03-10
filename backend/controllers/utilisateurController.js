@@ -82,7 +82,7 @@ const connexion = async (req, res) => {
 
 const getUtilisateurs = async (req, res) => {
   try {
-    const utilisateurs = await Utilisateur.find().select("-motDePasse");
+    const utilisateurs = await Utilisateur.find({ deletedAt: null }).select("-motDePasse");
     res.json({
       statut: "success",
       message: "Utilisateurs récupérés avec succès",
@@ -153,7 +153,7 @@ const updateUtilisateur = async (req, res) => {
 
 const deleteUtilisateur = async (req, res) => {
   try {
-    const utilisateur = await Utilisateur.findByIdAndDelete(req.params.id);
+    const utilisateur = await Utilisateur.findById(req.params.id);
     if (!utilisateur) {
       return res.status(404).json({
         statut: "error",
@@ -161,6 +161,8 @@ const deleteUtilisateur = async (req, res) => {
         data: null,
       });
     }
+    utilisateur.deletedAt = new Date();
+    await utilisateur.save();
     res.json({
       statut: "success",
       message: "Utilisateur supprimé avec succès",

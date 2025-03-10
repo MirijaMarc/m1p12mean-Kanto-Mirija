@@ -20,7 +20,7 @@ const createVoiture = async (req, res) => {
 
 const getVoitures = async (req, res) => {
   try {
-    const voitures = await Voiture.find();
+    const voitures = await Voiture.find({ deletedAt: null });
     res.json({
       statut: "success",
       message: "Voitures récupérées avec succès",
@@ -87,7 +87,7 @@ const updateVoiture = async (req, res) => {
 
 const deleteVoiture = async (req, res) => {
   try {
-    const voiture = await Voiture.findByIdAndDelete(req.params.id);
+    const voiture = await Voiture.findById(req.params.id);
     if (!voiture) {
       return res.status(404).json({
         statut: "error",
@@ -95,6 +95,8 @@ const deleteVoiture = async (req, res) => {
         data: null
       });
     }
+    voiture.deletedAt = new Date();
+    await voiture.save();
     res.json({
       statut: "success",
       message: "Voiture supprimée avec succès",

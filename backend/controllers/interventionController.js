@@ -1,4 +1,6 @@
 const Intervention = require("../models/Intervention");
+const Prestation = require("../models/Prestation");
+const { getInterventionDetails } = require("../services/interventionService");
 const { decodeToken } = require("../utils/jwt");
 
 const newIntervention = async (req, res) => {
@@ -36,11 +38,42 @@ const newIntervention = async (req, res) => {
 
 const getInterventions = async (req, res) => {
   try {
-    const interventions = await Intervention.find();
+    const interventions = await Intervention.find({ deletedAt: null });
+    const interventionsWithLabels = interventions.map((intervention) => {
+      return {
+        ...intervention.toObject(),
+        labelStatut: Intervention.getLabelStatut(intervention.statut)
+      };
+    });
     res.json({
       statut: "success",
       message: "Interventions récupérées avec succès",
-      data: interventions,
+      data: interventionsWithLabels,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getInterventionsByClient = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const clientId = decodeToken(token);
+    const interventions = await Intervention.find({ clientId: clientId, deletedAt: null });
+    const interventionsWithLabels = interventions.map((intervention) => {
+      return {
+        ...intervention.toObject(),
+        labelStatut: Intervention.getLabelStatut(intervention.statut)
+      };
+    });
+    res.json({
+      statut: "success",
+      message: "Interventions récupérées avec succès",
+      data: interventionsWithLabels
     });
   } catch (error) {
     res.status(500).json({
@@ -53,6 +86,23 @@ const getInterventions = async (req, res) => {
 
 const getInterventionById = async (req, res) => {
   try {
+    const intervention = await getInterventionDetails(req.params.id);
+    res.json({
+      statut: "success",
+      message: "Intervention récupérée avec succès",
+      data: intervention
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const annulerIntervention = async (req, res) => {
+  try {
     const intervention = await Intervention.findById(req.params.id);
     if (!intervention) {
       return res.status(404).json({
@@ -61,10 +111,12 @@ const getInterventionById = async (req, res) => {
         data: null,
       });
     }
+    intervention.statut = 3;
+    await intervention.save();
     res.json({
       statut: "success",
-      message: "Intervention récupérée avec succès",
-      data: intervention,
+      message: "Intervention annulée avec succès",
+      data: null,
     });
   } catch (error) {
     res.status(500).json({
@@ -107,7 +159,7 @@ const updateIntervention = async (req, res) => {
 
 const deleteIntervention = async (req, res) => {
   try {
-    const intervention = await Intervention.findByIdAndDelete(req.params.id);
+    const intervention = await Intervention.findById(req.params.id);
     if (!intervention) {
       return res.status(404).json({
         statut: "error",
@@ -115,6 +167,8 @@ const deleteIntervention = async (req, res) => {
         data: null,
       });
     }
+    intervention.deletedAt = new Date();
+    await intervention.save();
     res.json({
       statut: "success",
       message: "Intervention supprimée avec succès",
@@ -135,4 +189,6 @@ module.exports = {
   getInterventionById,
   updateIntervention,
   deleteIntervention,
+  getInterventionsByClient,
+  annulerIntervention
 };

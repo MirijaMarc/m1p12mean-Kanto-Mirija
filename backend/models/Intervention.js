@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const IntervationSchema = new mongoose.Schema(
+const InterventionSchema = new mongoose.Schema(
   {
     dateIntervention: { type: Date, required: true },
     clientId: {
@@ -10,11 +10,38 @@ const IntervationSchema = new mongoose.Schema(
     },
     description: { type: String },
     voiture: { type: Object, required: true },
-    prestationsId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Prestation", required: true }],
+    prestationsId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Prestation",
+        required: true,
+      },
+    ],
+    mecaniciensId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Utilisateur",
+      },
+    ],
     statut: { type: Number, required: true },
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Intervation", IntervationSchema);
+InterventionSchema.statics.getLabelStatut = (statut) => {
+  switch (statut) {
+    case 1:
+      return "En attente";
+    case 2:
+      return "En cours";
+    case 3:
+      return "Annulée";
+    case 4:
+      return "Terminée";
+    default:
+      return "Inconnu";
+  }
+};
+
+module.exports = mongoose.model("Intervention", InterventionSchema);

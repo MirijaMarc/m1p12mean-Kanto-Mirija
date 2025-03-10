@@ -20,7 +20,7 @@ const createPrestation = async (req, res) => {
 
 const getPrestations = async (req, res) => {
   try {
-    const prestations = await Prestation.find();
+    const prestations = await Prestation.find({ deletedAt: null });
     res.json({
       statut: "success",
       message: "Prestations récupérées avec succès",
@@ -87,7 +87,7 @@ const updatePrestation = async (req, res) => {
 
 const deletePrestation = async (req, res) => {
   try {
-    const prestation = await Prestation.findByIdAndDelete(req.params.id);
+    const prestation = await Prestation.findById(req.params.id);
     if (!prestation) {
       return res.status(404).json({
         statut: "error",
@@ -95,6 +95,8 @@ const deletePrestation = async (req, res) => {
         data: null
       });
     }
+    prestation.deletedAt = new Date();
+    await prestation.save();
     res.json({
       statut: "success",
       message: "Prestation supprimée avec succès",

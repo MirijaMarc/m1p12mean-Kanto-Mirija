@@ -9,3 +9,4 @@ const VoitureSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Voiture", VoitureSchema);
+
