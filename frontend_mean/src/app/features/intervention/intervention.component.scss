@@ -1,0 +1,7 @@
+
+/* Appliquer un flou sur le fond derrière le modal */
+.blur {
+filter: blur(1px);
+pointer-events: none; /* Empêche l'interaction avec le contenu derrière */
+}
+  
