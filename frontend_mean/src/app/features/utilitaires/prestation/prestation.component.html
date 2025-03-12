@@ -1,1 +1,104 @@
-<p>prestation works!</p>
+<div [class.blur]="isModalOpen" class="relative container mx-auto p-6">
+    <!-- Titre -->
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6">Prestations</h1>
+  
+    <!-- Recherche -->
+    <div class="mb-[50px] flex justify-between items-center">
+      <div class="w-full max-w-sm">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          placeholder="Recherche par mot-clé"
+          class="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <button (click)="openModal()" class="p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+        Ajouter un mecanicien
+      </button>
+    </div>
+  
+    <!-- Tableau -->
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+      <table class="min-w-full table-auto">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-3 text-left text-xl font-medium text-gray-600">Id</th>
+            <th class="px-4 py-3 text-left text-xl font-medium text-gray-600">Label Prestation</th>
+            <th class="px-4 py-3 text-left text-xl font-medium text-gray-600">Tarif</th>
+            <th class="px-4 py-3 text-left text-xl font-medium text-gray-600">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr *ngFor="let item of prestations">
+            <td class="px-4 py-3 text-sm text-gray-700">{{ item.id }}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">{{ item.label }}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">{{ item.tarif  | currency:'MGA'}}</td>
+            <td class="px-4 py-3 text-sm text-gray-700">
+              <button class="text-blue-500 hover:text-blue-700">Modifier</button>
+              <button class="ml-4 text-red-500 hover:text-red-700">Supprimer</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Pagination -->
+    <div class="mt-4 flex justify-between items-center">
+      <nav>
+        <ul class="flex space-x-2">
+          <li><button class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">Précédent</button></li>
+          <li><button class="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600">1</button></li>
+          <li><button class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">2</button></li>
+          <li><button class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">Suivant</button></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  
+  <!-- Modal pour prendre un rendez-vous -->
+  <div *ngIf="isModalOpen" class="no-blur fixed inset-0 flex justify-center items-center backdrop-blur-lg z-50">
+    <div class="bg-white p-6 rounded-lg w-96">
+      <h2 class="text-xl font-semibold mb-4">Ajouter une prestation</h2>
+      <form (ngSubmit)="submitForm()">
+
+        <!-- Date -->
+        <div class="mb-4">
+          <label for="date" class="block text-sm font-medium text-gray-700">Date et Heure</label>
+          <input 
+              id="date"
+              type="datetime-local"
+              [(ngModel)]="form.date"
+              name="date"
+              class="w-full p-3 border border-gray-300 rounded-md"
+              required
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+              id="description"
+              [(ngModel)]="form.description"
+              name="description"
+              rows="4"
+              class="w-full p-3 border border-gray-300 rounded-md"
+              required
+          ></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end gap-2">
+          <button type="button" (click)="closeModal()" class="p-2 bg-gray-300 rounded-md hover:bg-gray-400 cursor-pointer">Annuler</button>
+          <button type="submit" class="p-3 bg-green-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+            Ajouter
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>    
+
+
+
+  
