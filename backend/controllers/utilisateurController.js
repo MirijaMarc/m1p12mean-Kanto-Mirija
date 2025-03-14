@@ -2,6 +2,7 @@ const { generateToken } = require("../utils/jwt");
 const bcrypt = require("bcrypt");
 
 const Utilisateur = require("../models/Utilisateur");
+const { interventionEnCoursByMecanicien } = require("../services/interventionService");
 
 const inscription = async (req, res) => {
   try {
@@ -22,7 +23,7 @@ const inscription = async (req, res) => {
       email,
       motDePasse: hashMotDePasse,
       telephone,
-      role: [{ id: 1, label: "client" }]
+      role: [{ id: 1, label: "client" }],
     });
 
     await nouvelUtilisateur.save();
@@ -37,7 +38,7 @@ const inscription = async (req, res) => {
       message: error.message,
     });
   }
-}
+};
 
 const connexion = async (req, res) => {
   try {
@@ -82,7 +83,9 @@ const connexion = async (req, res) => {
 
 const getUtilisateurs = async (req, res) => {
   try {
-    const utilisateurs = await Utilisateur.find({ deletedAt: null }).select("-motDePasse");
+    const utilisateurs = await Utilisateur.find({ deletedAt: null }).select(
+      "-motDePasse"
+    );
     res.json({
       statut: "success",
       message: "Utilisateurs récupérés avec succès",
@@ -97,9 +100,63 @@ const getUtilisateurs = async (req, res) => {
   }
 };
 
+const getMecaniciens = async (req, res) => {
+  try {
+    const utilisateurs = await Utilisateur.find({
+      deletedAt: null,
+      role: { $elemMatch: { id: 2 } },
+    }).select("-motDePasse");
+    const mecaniciens = await Promise.all(
+      utilisateurs.map(async (mecanicien) => {
+        const interventionEnCours = await interventionEnCoursByMecanicien(
+          mecanicien._id
+        );
+
+        return {
+          ...mecanicien.toObject(),
+          interventionEnCours
+        };
+      })
+    );
+    res.json({
+      statut: "success",
+      message: "Mecaniciens récupérés avec succès",
+      data: mecaniciens,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getClients = async (req, res) => {
+  try {
+    const utilisateurs = await Utilisateur.find({
+      deletedAt: null,
+      role: { $elemMatch: { id: 1 } },
+    }).select("-motDePasse");
+    res.json({
+      statut: "success",
+      message: "Clients récupérés avec succès",
+      data: utilisateurs,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 const getUtilisateurById = async (req, res) => {
   try {
-    const utilisateur = await Utilisateur.findById(req.params.id).select('-motDePasse');
+    const utilisateur = await Utilisateur.findById(req.params.id).select(
+      "-motDePasse"
+    );
     if (!utilisateur) {
       return res.status(404).json({
         statut: "error",
@@ -111,6 +168,32 @@ const getUtilisateurById = async (req, res) => {
       statut: "success",
       message: "Utilisateur récupéré avec succès",
       data: utilisateur,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const setRoleMecanicien = async (req, res) => {
+  try {
+    const utilisateur = await Utilisateur.findById(req.params.id);
+    if (!utilisateur) {
+      return res.status(404).json({
+        statut: "error",
+        message: "Utilisateur non trouvé",
+        data: null,
+      });
+    }
+    utilisateur.role = [{ id: 2, label: "mecanicien" }];
+    await utilisateur.save();
+    res.json({
+      statut: "success",
+      message: "Rôle mis à jour avec succès",
+      data: null,
     });
   } catch (error) {
     res.status(500).json({
@@ -184,4 +267,7 @@ module.exports = {
   getUtilisateurById,
   updateUtilisateur,
   deleteUtilisateur,
+  setRoleMecanicien,
+  getMecaniciens,
+  getClients
 };

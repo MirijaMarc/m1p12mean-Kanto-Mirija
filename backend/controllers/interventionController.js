@@ -1,6 +1,12 @@
 const Intervention = require("../models/Intervention");
 const Prestation = require("../models/Prestation");
-const { getInterventionDetails } = require("../services/interventionService");
+const {
+  getInterventionDetailsById,
+  getProchaineInterventionDB,
+  getInterventionsDetails,
+  getInterventionsDetailsByClient,
+  getInterventionsDetailsByMecanicien,
+} = require("../services/interventionService");
 const { decodeToken } = require("../utils/jwt");
 
 const newIntervention = async (req, res) => {
@@ -38,17 +44,11 @@ const newIntervention = async (req, res) => {
 
 const getInterventions = async (req, res) => {
   try {
-    const interventions = await Intervention.find({ deletedAt: null });
-    const interventionsWithLabels = interventions.map((intervention) => {
-      return {
-        ...intervention.toObject(),
-        labelStatut: Intervention.getLabelStatut(intervention.statut)
-      };
-    });
+    const interventions = await getInterventionsDetails();
     res.json({
       statut: "success",
       message: "Interventions récupérées avec succès",
-      data: interventionsWithLabels,
+      data: interventions,
     });
   } catch (error) {
     res.status(500).json({
@@ -63,17 +63,30 @@ const getInterventionsByClient = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
     const clientId = decodeToken(token);
-    const interventions = await Intervention.find({ clientId: clientId, deletedAt: null });
-    const interventionsWithLabels = interventions.map((intervention) => {
-      return {
-        ...intervention.toObject(),
-        labelStatut: Intervention.getLabelStatut(intervention.statut)
-      };
-    });
+    const interventions = await getInterventionsDetailsByClient(clientId);
     res.json({
       statut: "success",
       message: "Interventions récupérées avec succès",
-      data: interventionsWithLabels
+      data: interventions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getInterventionsByMecanicien = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const mecanicienId = decodeToken(token);
+    const interventions = await getInterventionsDetailsByMecanicien(mecanicienId);
+    res.json({
+      statut: "success",
+      message: "Interventions récupérées avec succès",
+      data: interventions,
     });
   } catch (error) {
     res.status(500).json({
@@ -86,11 +99,11 @@ const getInterventionsByClient = async (req, res) => {
 
 const getInterventionById = async (req, res) => {
   try {
-    const intervention = await getInterventionDetails(req.params.id);
+    const intervention = await getInterventionDetailsById(req.params.id);
     res.json({
       statut: "success",
       message: "Intervention récupérée avec succès",
-      data: intervention
+      data: intervention,
     });
   } catch (error) {
     res.status(500).json({
@@ -100,6 +113,54 @@ const getInterventionById = async (req, res) => {
     });
   }
 };
+
+const getProchaineIntervention = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const clientId = decodeToken(token);
+
+    const intervention = await getProchaineInterventionDB(clientId);
+    res.json({
+      statut: "success",
+      message: "Intervention récupérée avec succès",
+      data: intervention,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const assignerMecaniciensIntervention = async (req, res) => {
+  try {
+    const { mecaniciensId } = req.body;
+    const intervention = await Intervention.findById(req.params.id);
+    if (!intervention) {
+      return res.status(404).json({
+        statut: "error",
+        message: "Intervention non trouvée",
+        data: null,
+      });
+    }
+    intervention.mecaniciensId = mecaniciensId;
+    await intervention.save();
+    res.json({
+      statut: "success",
+      message: "Mécaniciens assignés avec succès",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 
 const annulerIntervention = async (req, res) => {
   try {
@@ -116,6 +177,58 @@ const annulerIntervention = async (req, res) => {
     res.json({
       statut: "success",
       message: "Intervention annulée avec succès",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const commencerIntervention = async (req, res) => {
+  try {
+    const intervention = await Intervention.findById(req.params.id);
+    if (!intervention) {
+      return res.status(404).json({
+        statut: "error",
+        message: "Intervention non trouvée",
+        data: null,
+      });
+    }
+    intervention.statut = 2;
+    await intervention.save();
+    res.json({
+      statut: "success",
+      message: "Intervention commencée avec succès",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const terminerIntervention = async (req, res) => {
+  try {
+    const intervention = await Intervention.findById(req.params.id);
+    if (!intervention) {
+      return res.status(404).json({
+        statut: "error",
+        message: "Intervention non trouvée",
+        data: null,
+      });
+    }
+    intervention.statut = 4;
+    await intervention.save();
+    res.json({
+      statut: "success",
+      message: "Intervention terminée avec succès",
       data: null,
     });
   } catch (error) {
@@ -189,6 +302,11 @@ module.exports = {
   getInterventionById,
   updateIntervention,
   deleteIntervention,
+  annulerIntervention,
+  getProchaineIntervention,
+  commencerIntervention,
+  terminerIntervention,
   getInterventionsByClient,
-  annulerIntervention
+  getInterventionsByMecanicien,
+  assignerMecaniciensIntervention
 };
