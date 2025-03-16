@@ -1,90 +1,123 @@
-<div class="flex h-screen bg-gray-100">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-lg flex flex-col">
-    <!-- Logo & Nom -->
-        <div class="p-1 flex items-center justify-center border-b border-gray-200">
-        <img src="assets/img/logo.png" alt="Logo" class="h-16">
-        <h2 class="text-xl font-semibold text-gray-700">Auto Manage</h2>
+
+
+<nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+  <div class="px-3 py-3 lg:px-5 lg:pl-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center justify-start rtl:justify-end">
+        <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+            <span class="sr-only">Open sidebar</span>
+            <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+               <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
+            </svg>
+         </button>
+        <a href="https://flowbite.com" class="flex ms-2 md:me-24">
+          <img src="https://flowbite.com/docs/images/logo.svg" class="h-8 me-3" alt="FlowBite Logo" />
+          <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Flowbite</span>
+        </a>
       </div>
-  
-      <!-- Navigation -->
-      <nav class="flex-1 mt-6">
-        <ul>
-          <li routerLink="/dashboard" routerLinkActive="active-link" class="p-6 hover:bg-gray-200 transition rounded cursor-pointer">
-            <a class="flex items-center gap-3">
-              <fa-icon [icon]="faDashboard" class="text-blue-500"></fa-icon> Tableau de bord
-            </a>
-          </li>
-          <li routerLink="/intervention" routerLinkActive="active-link" class="p-6 hover:bg-gray-200 transition rounded cursor-pointer">
-            <a class="flex items-center gap-3">
-              <fa-icon [icon]="faRendezVous" class="text-green-500"></fa-icon> Interventions
-            </a>
-          </li>
-          <li routerLink="/calendrier" routerLinkActive="active-link" class="p-6 hover:bg-gray-200 transition rounded cursor-pointer">
-            <a class="flex items-center gap-3">
-              <fa-icon [icon]="faCalendrier" class="text-yellow-500"></fa-icon> Calendrier
-            </a>
-          </li>
-          <li routerLink="/notifications" routerLinkActive="active-link" class="p-6 hover:bg-gray-200 transition rounded cursor-pointer">
-            <a class="flex items-center gap-3">
-              <fa-icon [icon]="faNotifications" class="text-red-500"></fa-icon> Notifications
-            </a>
-          </li>
-  
-          <!-- Menu Déroulant Utilitaires -->
-          <li class="p-6 hover:bg-gray-200 transition rounded cursor-pointer" (click)="toggleDropdown()">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <fa-icon [icon]="faTools" class="text-gray-500"></fa-icon> Utilitaires
-              </div>
-              <fa-icon [icon]="dropdownOpen ? faChevronUp : faChevronDown"></fa-icon>
+      <div class="flex items-center">
+          <div class="flex items-center ms-3">
+            <div>
+              <button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
+                <span class="sr-only">Open user menu</span>
+                <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="user photo">
+              </button>
             </div>
-          </li>
-          <ul *ngIf="dropdownOpen" class="ml-6 mt-2 space-y-2 border-l border-gray-300 pl-4 transition-all duration-300">
-            <li class="p-2 hover:bg-gray-100 rounded">
-              <a routerLink="/mecanicien" routerLinkActive="active-link" class="flex items-center gap-3">
-                <fa-icon [icon]="faMecaniciens" class="text-indigo-500"></fa-icon> Mécaniciens
-              </a>
-            </li>
-            <li class="p-2 hover:bg-gray-100 rounded">
-              <a routerLink="/client" routerLinkActive="active-link" class="flex items-center gap-3">
-                <fa-icon [icon]="faClients" class="text-blue-500"></fa-icon> Clients
-              </a>
-            </li>
-            <li class="p-2 hover:bg-gray-100 rounded">
-              <a routerLink="/prestation" routerLinkActive="active-link" class="flex items-center gap-3">
-                <fa-icon [icon]="faPrestations" class="text-purple-500"></fa-icon> Prestations
-              </a>
-            </li>
-            <li class="p-2 hover:bg-gray-100 rounded">
-              <a routerLink="/voiture" routerLinkActive="active-link" class="flex items-center gap-3">
-                <fa-icon [icon]="faVoitures" class="text-orange-500"></fa-icon> Voitures
-              </a>
-            </li>
-          </ul>
-        </ul>
-      </nav>
-    </aside>
-  
-    <!-- Main Content -->
-    <div class="flex flex-col flex-1">
-      <!-- Header -->
-      <header class="bg-white shadow-md p-4 flex justify-between items-center">
-        <h1 class="text-xl font-semibold"></h1>
-        <div class="flex items-center gap-4">
-          <span class="text-gray-700 font-medium">Utilisateur</span>
-            <!-- Ajout de l'image -->
-            <img src="assets/img/user.png" alt="Utilisateur" class="w-10 h-10 rounded-full object-cover">
-          <button class="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition">
-            <fa-icon [icon]="faSignOut" class="text-gray-700"></fa-icon>
-          </button>
+            <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
+              <div class="px-4 py-3" role="none">
+                <p class="text-sm text-gray-900 dark:text-white" role="none">
+                  Neil Sims
+                </p>
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
+                  neil.sims   flowbite.com
+                </p>
+              </div>
+              <ul class="py-1" role="none">
+                <li>
+                  <a routerLink="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Sign out</a>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-      </header>
-  
-      <!-- Page Content -->
-      <main class="p-6 flex-1">
-        <router-outlet></router-outlet>
-      </main>
     </div>
   </div>
-  
+</nav>
+
+<aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
+   <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+      <ul class="space-y-2 font-medium">
+         <li>
+            <a routerLink="dashboard" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              <fa-icon [icon]="faChartLine"></fa-icon>
+               <span class="ms-3">Tableau de bord</span>
+            </a>
+         </li>
+         <li>
+          <a routerLink="calendrier" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <fa-icon [icon]="faCalendarCheck"></fa-icon>
+             <span class="ms-3">Calendrier</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="intervention" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <fa-icon [icon]="faBriefcase"></fa-icon>
+             <span class="ms-3">Interventions</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="dashboard" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <fa-icon [icon]="faBell"></fa-icon>
+             <span class="ms-3">Notifications</span>
+          </a>
+        </li>
+         <li>
+          <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
+                <fa-icon [icon]="fatools"></fa-icon>
+                <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Utilitaires</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                </svg>
+          </button>
+          <ul id="dropdown-example" class="hidden py-2 space-y-2">
+                <li>
+                   <a routerLink="mecanicien" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                    <fa-icon [icon]="faWrench"></fa-icon>
+                    <span class="ms-3">Mécaniciens</span>
+                   </a>
+                </li>
+                <li>
+                   <a routerLink="client" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                    <fa-icon [icon]="faHandshake"></fa-icon>
+                    <span class="ms-3">Clients</span>
+                   </a>
+                </li>
+                <li>
+                   <a routerLink="voiture" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                    <fa-icon [icon]="faCar"></fa-icon>
+                    <span class="ms-3">Voitures</span>
+                    </a>
+                </li>
+                <li>
+                  <a routerLink="prestation" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                    <fa-icon [icon]="faTasks"></fa-icon>
+                    <span class="ms-3">Préstations</span>
+                  </a>
+                </li>
+                <li>
+                  <a routerLink="" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                    <fa-icon [icon]="faUsers"></fa-icon>
+                    <span class="ms-3">Utilisateurs</span>
+                  </a>
+                </li>
+          </ul>
+       </li>
+      </ul>
+   </div>
+</aside>
+
+<div class="p-4 mt-5 sm:ml-64">
+  <div class="h-full px-3 p-10 pb-4 overflow-y-auto">
+    <router-outlet></router-outlet>
+  </div>
+</div>

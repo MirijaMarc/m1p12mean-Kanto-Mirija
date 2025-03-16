@@ -1,0 +1,51 @@
+<h2 class="text-3xl font-bold text-white">Calendrier</h2>
+<div class="flex items-center justify-between mt-5">
+
+  <div class="flex space-x-4 p-2 bg-slate-800 rounded-lg shadow-md mb-5 w-[25%]">
+    <button type="button" [ngClass]="{'bg-white !text-black' : isDayView}" (click)="changeView('day')" class="flex-1 px-4  focus:outline-none focus:shadow-outline-blue transition-all duration-300 text-sm text-white rounded-md">Jour</button>
+    <button type="button" [ngClass]="{'bg-white !text-black' : isWeekView}" (click)="changeView('week')" class="flex-1  px-4  focus:outline-none focus:shadow-outline-blue transition-all duration-300 text-sm text-white rounded-md">Semaine</button>
+    <button type="button" [ngClass]="{'bg-white !text-black' : isMonthView}" (click)="changeView('month')" class="flex-1  px-4  focus:outline-none focus:shadow-outline-blue transition-all duration-300 text-sm text-white rounded-md">Mois</button>
+  </div>
+
+  <!-- Affichage de la date/ semaine/ mois en fonction de la vue -->
+  <div class="text-lg font-medium mb-4 text-white">
+    <span *ngIf="isDayView"><i class="pi pi-calendar"></i>&nbsp;{{ formatDate(viewDate) }}</span>
+    <span *ngIf="isWeekView"><i class="pi pi-calendar"></i>&nbsp;{{ formatWeek(viewDate) }}</span>
+    <span *ngIf="isMonthView"><i class="pi pi-calendar"></i>&nbsp;{{ formatMonth(viewDate) }}</span>
+  </div>
+
+     <!-- Boutons de navigation -->
+  <div class="flex space-x-4 p-2 bg-slate-800 rounded-lg shadow-md mb-5 justify-center">
+    <button (click)="previous()" class="px-4 bg-white hover:bg-gray-300 text-sm flex items-center rounded-md gap-2"><fa-icon [icon]="faArrowLeft"></fa-icon><span>Précédent</span></button>
+    <button (click)="goToToday()" class="px-4 bg-white hover:bg-kc-blue-light-hovered text-sm rounded-md">Aujourd'hui</button>
+    <button (click)="next()" class="px-4 bg-white hover:bg-gray-300 text-sm flex items-center rounded-md gap-2"><span>Suivant</span><fa-icon [icon]="faArrowRight"></fa-icon></button>
+  </div>
+
+
+
+</div>
+
+<div>
+  <mwl-calendar-day-view
+  *ngIf="isDayView"
+  [viewDate]="viewDate"
+  [events]="events"
+  (hourSegmentClicked)="handleHourSegmentClick($event)">
+  </mwl-calendar-day-view>
+
+  <mwl-calendar-month-view
+  *ngIf="isMonthView"
+  [viewDate]="viewDate"
+  [events]="events"
+  (dayClicked)="handleDayClick($event.day)">
+  </mwl-calendar-month-view>
+
+  <mwl-calendar-week-view
+  *ngIf="isWeekView"
+  [viewDate]="viewDate"
+  [events]="events"
+  (hourSegmentClicked)="handleHourSegmentClick($event)">
+  >
+  </mwl-calendar-week-view>
+
+</div>
