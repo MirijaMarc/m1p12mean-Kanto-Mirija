@@ -11,6 +11,7 @@ import { MecanicienComponent } from './features/utilitaires/mecanicien/mecanicie
 import { PrestationComponent } from './features/utilitaires/prestation/prestation.component';
 import { VoitureComponent } from './features/utilitaires/voiture/voiture.component';
 import { UtilisateurComponent } from './features/utilitaires/utilisateur/utilisateur.component';
+import { NotificationComponent } from './features/notification/notification.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -27,7 +28,8 @@ export const routes: Routes = [
         { path: 'mecanicien', component: MecanicienComponent },
         { path: 'prestation', component: PrestationComponent },
         { path: 'voiture', component: VoitureComponent },
-        { path: 'utilisateur', component: UtilisateurComponent },
+        { path: 'utilisateur', component: UtilisateurComponent},
+        { path: 'notification', component: NotificationComponent},
       ]
     }
   ];
