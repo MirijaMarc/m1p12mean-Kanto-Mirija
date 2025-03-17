@@ -22,7 +22,7 @@ export const routes: Routes = [
         { path: 'intervention', component: InterventionComponent },
         { path: 'dashboard', component: DashboardComponent },
         { path: 'calendrier', component: CalendrierComponent },
-        { path: 'detail-intervention', component: DetailInterventionComponent },
+        { path: 'detail-intervention/:id', component: DetailInterventionComponent },
         { path: 'client', component: ClientComponent },
         { path: 'mecanicien', component: MecanicienComponent },
         { path: 'prestation', component: PrestationComponent },
