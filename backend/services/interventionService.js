@@ -1,7 +1,26 @@
 const Intervention = require("../models/Intervention");
 const Utilisateur = require("../models/Utilisateur");
-const { getPrestationsByIds } = require("./prestationService");
+const Prestation = require("../models/Prestation");
+const {
+  getPrestationsByIds,
+  getPrixRecentPrestation,
+} = require("./prestationService");
 const { getUtilisateursByIds } = require("./utilisateurService");
+
+const calculMontantIntervention = async (prestationsId) => {
+  try {
+    let montant = 0;
+    for (const prestationId of prestationsId) {
+      console.log(await getPrixRecentPrestation(prestationId)+" monnnnnn");
+
+      montant += await getPrixRecentPrestation(prestationId);
+    }
+    return montant;
+  } catch (error) {
+    console.error("Erreur lors du calcul du montant de l'intervention:", error);
+    throw error;
+  }
+};
 
 const getInterventionsDetails = async () => {
   try {
@@ -175,11 +194,195 @@ const interventionEnCoursByMecanicien = async (mecanicienId) => {
   }
 };
 
+const getInterventionByStatut = async () => {
+  try {
+    const counts = await Intervention.aggregate([
+      { $match: { deletedAt: null } },
+      {
+        $group: {
+          _id: "$statut",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const result = {
+      statut_1: 0, // en attente
+      statut_2: 0, // en cours
+      statut_3: 0, // annulee
+      statut_4: 0, // terminee
+    };
+
+    counts.forEach(({ _id, count }) => {
+      result[`statut_${_id}`] = count;
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Erreur", error);
+    throw error;
+  }
+};
+
+const getTotalPrestations = async (mecanicienId) => {
+  try {
+    const totalPrestations = await Intervention.aggregate([
+      {
+        $match: {
+          statut: { $ne: 3 },
+          deletedAt: null,
+        },
+      },
+      { $unwind: "$prestationsId" },
+      {
+        $group: {
+          _id: null,
+          totalPrestations: { $sum: 1 },
+        },
+      },
+    ]);
+
+    return totalPrestations.length > 0
+      ? totalPrestations[0].totalPrestations
+      : 0;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération du nombre de prestations",
+      error
+    );
+    throw error;
+  }
+};
+
+const getTotalPrestationsParJour = async (mecanicienId) => {
+  try {
+    const totalPrestationsParJour = await Intervention.aggregate([
+      {
+        $match: {
+          statut: { $ne: 3 },
+          deletedAt: null,
+        },
+      },
+      { $unwind: "$prestationsId" },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$dateIntervention" },
+          },
+          totalPrestations: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          jour: "$_id",
+          totalPrestations: 1,
+        },
+      },
+    ]);
+
+    return totalPrestationsParJour;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération du nombre de prestations par jour",
+      error
+    );
+    throw error;
+  }
+};
+
+const getTotalPrestationsParType = async () => {
+  try {
+    const nbTotalPrestationsParType = await Prestation.aggregate([
+      {
+        $match: { deletedAt: null },
+      },
+      {
+        $lookup: {
+          from: "interventions",
+          localField: "_id",
+          foreignField: "prestationsId",
+          as: "interventions",
+        },
+      },
+      {
+        $unwind: {
+          path: "$interventions",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: {
+          $or: [
+            { "interventions.statut": { $ne: 3 } },
+            { interventions: { $exists: false } },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          label: { $first: "$label" },
+          totalPrestations: {
+            $sum: { $cond: [{ $ifNull: ["$interventions", false] }, 1, 0] },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          prestationId: "$_id",
+          label: 1,
+          totalPrestations: 1,
+        },
+      },
+    ]);
+
+    return nbTotalPrestationsParType;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération du nombre de prestations",
+      error
+    );
+    throw error;
+  }
+};
+
+const getTotalMontantInterventions = async () => {
+  try {
+    const totalMontant = await Intervention.aggregate([
+      {
+        $match: { deletedAt: null, statut: { $ne: 3 } },
+      },
+      {
+        $group: {
+          _id: null,
+          totalMontant: { $sum: "$montant" },
+        },
+      },
+    ]);
+
+    return totalMontant.length > 0 ? totalMontant[0].totalMontant : 0;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération du montant total des interventions",
+      error
+    );
+    throw error;
+  }
+};
+
 module.exports = {
   getInterventionDetailsById,
   getProchaineInterventionDB,
   getInterventionsDetails,
   getInterventionsDetailsByClient,
   getInterventionsDetailsByMecanicien,
-  interventionEnCoursByMecanicien
+  interventionEnCoursByMecanicien,
+  getInterventionByStatut,
+  getTotalPrestations,
+  getTotalPrestationsParJour,
+  getTotalPrestationsParType,
+  calculMontantIntervention,
+  getTotalMontantInterventions
 };

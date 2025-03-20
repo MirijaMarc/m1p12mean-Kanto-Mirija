@@ -24,6 +24,7 @@ const InterventionSchema = new mongoose.Schema(
       },
     ],
     statut: { type: Number, required: true },
+    montant: { type: Number, required: true },
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
