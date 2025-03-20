@@ -1,0 +1,38 @@
+<h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Notifications</h2>
+<div class="mx-auto p-6 bg-white shadow-md rounded-lg mt-5 dark:bg-gray-800 dark:text-white">
+    <div class="flex justify-between items-center mb-4">
+        <fa-icon [icon]="faBell" class="text-2xl"></fa-icon>
+      <button 
+        (click)="markAllAsRead()" 
+        class="text-blue-600 hover:underline dark:text-blue-400">
+        Tout marquer comme lu
+      </button>
+    </div>
+  
+    <div *ngIf="notifications.length === 0" class="text-gray-500 text-center dark:text-gray-400">
+      Aucune notification pour le moment.
+    </div>
+  
+    <ul>
+      <li *ngFor="let notification of notifications" 
+          class="flex justify-between items-center p-4 border-b dark:border-gray-700"
+          [class.bg-gray-100]="!notification.read" 
+          [class.dark:bg-gray-600]="!notification.read">
+  
+        <div>
+          <p [class.font-semibold]="!notification.read" class="dark:text-gray-300">
+            {{ notification.message }}
+          </p>
+          <span class="text-sm text-gray-500 dark:text-gray-400">{{ notification.date }}</span>
+        </div>
+  
+        <button 
+          *ngIf="!notification.read" 
+          (click)="markAsRead(notification)" 
+          class="text-green-600 hover:underline text-sm dark:text-green-400">
+          Marquer comme lu
+        </button>
+      </li>
+    </ul>
+  </div>
+  
