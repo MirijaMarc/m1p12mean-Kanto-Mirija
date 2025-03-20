@@ -10,3 +10,6 @@ export default interface Notification {
     updatedAt: Date
     deletedAt: Date | null
 }
+
+
+

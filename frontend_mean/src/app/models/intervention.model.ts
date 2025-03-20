@@ -15,3 +15,4 @@ export default interface Intervention {
     deletedAt: Date | null
 
 }
+
