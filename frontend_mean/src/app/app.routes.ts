@@ -20,6 +20,7 @@ export const routes: Routes = [
       path: '',
       component: LayoutComponent,
       children: [
+        { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         { path: 'intervention', component: InterventionComponent },
         { path: 'dashboard', component: DashboardComponent },
         { path: 'calendrier', component: CalendrierComponent },
