@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Flowbite } from '../../core/decorator/flowbite.decorator';
 import { initFlowbite } from 'flowbite';
 import { ApexAxisChartSeries, ApexChart, ApexDataLabels, ApexTitleSubtitle, ApexXAxis, NgApexchartsModule } from 'ng-apexcharts';
+import { CommonModule } from '@angular/common';
 
 interface ChartOptions {
   series: ApexAxisChartSeries | number[];
@@ -15,7 +16,7 @@ interface ChartOptions {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgApexchartsModule],
+  imports: [NgApexchartsModule, CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })

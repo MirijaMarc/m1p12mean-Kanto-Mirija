@@ -3,3 +3,9 @@
 @tailwind utilities;
 
 @import "../node_modules/angular-calendar/css/angular-calendar.css";
+
+
+.active{
+    --tw-bg-opacity: 1;
+    background-color: rgb(55 65 81 / var(--tw-bg-opacity, 1)); /* #374151 */
+}

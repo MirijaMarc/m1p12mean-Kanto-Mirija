@@ -48,25 +48,25 @@
    <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
       <ul class="space-y-2 font-medium">
          <li>
-            <a routerLink="dashboard" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+            <a routerLink="dashboard" routerLinkActive="active" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
               <fa-icon [icon]="faChartLine"></fa-icon>
                <span class="ms-3">Tableau de bord</span>
             </a>
          </li>
          <li>
-          <a routerLink="calendrier" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a routerLink="calendrier" routerLinkActive="active" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
             <fa-icon [icon]="faCalendarCheck"></fa-icon>
              <span class="ms-3">Calendrier</span>
           </a>
         </li>
         <li>
-          <a routerLink="intervention" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a routerLink="intervention" routerLinkActive="active" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
             <fa-icon [icon]="faBriefcase"></fa-icon>
              <span class="ms-3">Interventions</span>
           </a>
         </li>
         <li>
-          <a routerLink="notification" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a routerLink="notification" routerLinkActive="active" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
             <fa-icon [icon]="faBell"></fa-icon>
              <span class="ms-3">Notifications</span>
           </a>
@@ -81,31 +81,31 @@
           </button>
           <ul id="dropdown-example" class="hidden py-2 space-y-2">
                 <li>
-                   <a routerLink="mecanicien" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                   <a routerLink="mecanicien" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faWrench"></fa-icon>
                     <span class="ms-3">Mécaniciens</span>
                    </a>
                 </li>
                 <li>
-                   <a routerLink="client" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                   <a routerLink="client" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faHandshake"></fa-icon>
                     <span class="ms-3">Clients</span>
                    </a>
                 </li>
                 <li>
-                   <a routerLink="voiture" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                   <a routerLink="voiture" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faCar"></fa-icon>
                     <span class="ms-3">Voitures</span>
                     </a>
                 </li>
                 <li>
-                  <a routerLink="prestation" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                  <a routerLink="prestation" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faTasks"></fa-icon>
                     <span class="ms-3">Préstations</span>
                   </a>
                 </li>
                 <li>
-                  <a routerLink="utilisateur" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                  <a routerLink="utilisateur" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faUsers"></fa-icon>
                     <span class="ms-3">Utilisateurs</span>
                   </a>
