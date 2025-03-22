@@ -10,9 +10,9 @@
                <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
             </svg>
          </button>
-        <a href="https://flowbite.com" class="flex ms-2 md:me-24">
-          <img src="https://flowbite.com/docs/images/logo.svg" class="h-8 me-3" alt="FlowBite Logo" />
-          <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Flowbite</span>
+        <a class="flex ms-2 md:me-24">
+          <img src="assets/img/logo.png" class="h-9 me-3" alt="FlowBite Logo" />
+          <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Garage Manage</span>
         </a>
       </div>
       <div class="flex items-center">
@@ -26,15 +26,15 @@
             <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
               <div class="px-4 py-3" role="none">
                 <p class="text-sm text-gray-900 dark:text-white" role="none">
-                  Neil Sims
+                  {{ user.nom}}
                 </p>
                 <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
-                  neil.sims   flowbite.com
+                  {{ user.email }}
                 </p>
               </div>
               <ul class="py-1" role="none">
                 <li>
-                  <a routerLink="" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Sign out</a>
+                  <a (click)="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">Sign out</a>
                 </li>
               </ul>
             </div>
@@ -47,31 +47,31 @@
 <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
    <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
       <ul class="space-y-2 font-medium">
-         <li>
-            <a routerLink="dashboard" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+         <li *ngIf="role == env.role.manager">
+            <a routerLink="dashboard" routerLinkActive="active" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
               <fa-icon [icon]="faChartLine"></fa-icon>
                <span class="ms-3">Tableau de bord</span>
             </a>
          </li>
          <li>
-          <a routerLink="calendrier" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+           <a routerLink="intervention" routerLinkActive="active" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+             <fa-icon [icon]="faBriefcase"></fa-icon>
+              <span class="ms-3">Interventions</span>
+           </a>
+         </li>
+         <li>
+          <a routerLink="calendrier" routerLinkActive="active" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
             <fa-icon [icon]="faCalendarCheck"></fa-icon>
              <span class="ms-3">Calendrier</span>
           </a>
         </li>
         <li>
-          <a routerLink="intervention" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-            <fa-icon [icon]="faBriefcase"></fa-icon>
-             <span class="ms-3">Interventions</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="notification" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <a routerLink="notification" routerLinkActive="active" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
             <fa-icon [icon]="faBell"></fa-icon>
              <span class="ms-3">Notifications</span>
           </a>
         </li>
-         <li>
+         <li *ngIf="role == env.role.manager">
           <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-example" data-collapse-toggle="dropdown-example">
                 <fa-icon [icon]="fatools"></fa-icon>
                 <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Utilitaires</span>
@@ -81,31 +81,31 @@
           </button>
           <ul id="dropdown-example" class="hidden py-2 space-y-2">
                 <li>
-                   <a routerLink="mecanicien" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                   <a routerLink="mecanicien" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faWrench"></fa-icon>
                     <span class="ms-3">Mécaniciens</span>
                    </a>
                 </li>
                 <li>
-                   <a routerLink="client" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                   <a routerLink="client" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faHandshake"></fa-icon>
                     <span class="ms-3">Clients</span>
                    </a>
                 </li>
                 <li>
-                   <a routerLink="voiture" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                   <a routerLink="voiture" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faCar"></fa-icon>
                     <span class="ms-3">Voitures</span>
                     </a>
                 </li>
                 <li>
-                  <a routerLink="prestation" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                  <a routerLink="prestation" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faTasks"></fa-icon>
                     <span class="ms-3">Préstations</span>
                   </a>
                 </li>
                 <li>
-                  <a routerLink="utilisateur" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+                  <a routerLink="utilisateur" routerLinkActive="active" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
                     <fa-icon [icon]="faUsers"></fa-icon>
                     <span class="ms-3">Utilisateurs</span>
                   </a>

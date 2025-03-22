@@ -1,9 +1,9 @@
 <div class="flex min-h-screen bg-gray-100 dark:bg-gray-800">
     <!-- Image à gauche -->
-    <div class="w-[60%] bg-center hidden lg:block bg-white" 
+    <div class="w-[60%] bg-center hidden lg:block bg-white"
       style="background-image: url('assets/img/car.png'); background-size: contain; background-repeat: no-repeat;">
   </div>
-  
+
     <!-- Formulaire à droite -->
     <div class="w-full lg:w-[40%] flex items-center justify-center px-6 py-12 sm:px-12">
       <div class="w-full max-w-md space-y-8">
@@ -13,30 +13,33 @@
             Connectez-vous pour gérer votre garage
           </p>
         </div>
-  
-        <form class="mt-8 space-y-10" action="#" method="POST">
+
+        <form [formGroup]="loginForm" class="mt-8 space-y-10" (ngSubmit)="onSubmit()">
           <div class="rounded-md shadow-sm -space-y-px">
             <div class="mb-5">
                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                <input type="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@flowbite.com" required />
+                <input formControlName="email" type="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@email.com" required />
             </div>
             <div class="mb-5">
                 <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mot de passe</label>
-                <input type="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                <input formControlName="motDePasse" type="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="......." required />
             </div>
           </div>
-  
-  
+
+
           <div>
             <button type="submit"
               class="group relative w-full py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:focus:ring-indigo-700">
-              Se connecter
+              <i *ngIf="isLoading" class="pi pi-spin pi-spinner text-sm"></i>
+              <span *ngIf="!isLoading">
+                Se connecter
+              </span>
             </button>
           </div>
 
           <div class="text-center mt-4">
             <p class="text-sm text-gray-600 dark:text-gray-400">
-                Pas encore de compte ? 
+                Pas encore de compte ?
                 <a routerLink="/signup" class="text-indigo-600 hover:underline dark:text-indigo-400">Inscrivez-vous</a>
             </p>
           </div>
@@ -44,4 +47,4 @@
       </div>
     </div>
   </div>
-  
+<p-toast />

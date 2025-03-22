@@ -2,7 +2,9 @@ const { generateToken } = require("../utils/jwt");
 const bcrypt = require("bcrypt");
 
 const Utilisateur = require("../models/Utilisateur");
-const { interventionEnCoursByMecanicien } = require("../services/interventionService");
+const {
+  interventionEnCoursByMecanicien,
+} = require("../services/interventionService");
 
 const inscription = async (req, res) => {
   try {
@@ -64,8 +66,7 @@ const connexion = async (req, res) => {
         data: null,
       });
     }
-
-    const token = generateToken(utilisateur._id);
+    const token = generateToken(utilisateur);
 
     res.status(200).json({
       statut: "success",
@@ -102,10 +103,21 @@ const getUtilisateurs = async (req, res) => {
 
 const getMecaniciens = async (req, res) => {
   try {
-    const utilisateurs = await Utilisateur.find({
-      deletedAt: null,
-      role: { $elemMatch: { id: 2 } },
-    }).select("-motDePasse");
+    const { recherche } = req.query;
+    let condition = { deletedAt: null, role: { $elemMatch: { id: 2 } } };
+
+    if (recherche) {
+      condition = {
+        ...condition,
+        $or: [
+          { nom: { $regex: recherche, $options: "i" } },
+          { email: { $regex: recherche, $options: "i" } },
+        ],
+      };
+    }
+
+    const utilisateurs = await Utilisateur.find(condition).select("-motDePasse");
+
     const mecaniciens = await Promise.all(
       utilisateurs.map(async (mecanicien) => {
         const interventionEnCours = await interventionEnCoursByMecanicien(
@@ -114,7 +126,7 @@ const getMecaniciens = async (req, res) => {
 
         return {
           ...mecanicien.toObject(),
-          interventionEnCours
+          interventionEnCours,
         };
       })
     );
@@ -134,14 +146,43 @@ const getMecaniciens = async (req, res) => {
 
 const getClients = async (req, res) => {
   try {
-    const utilisateurs = await Utilisateur.find({
-      deletedAt: null,
-      role: { $elemMatch: { id: 1 } },
-    }).select("-motDePasse");
+    const { recherche } = req.query;
+    let condition = { deletedAt: null, role: { $elemMatch: { id: 1 } } };
+
+    if (recherche) {
+      condition = {
+        ...condition,
+        $or: [
+          { nom: { $regex: recherche, $options: "i" } },
+          { email: { $regex: recherche, $options: "i" } },
+        ],
+      };
+    }
+
+    const clients = await Utilisateur.find(condition).select("-motDePasse");
     res.json({
       statut: "success",
       message: "Clients récupérés avec succès",
-      data: utilisateurs,
+      data: clients,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getNbClients = async (req, res) => {
+  try {
+    const nbClient = await Utilisateur.countDocuments({
+      role: { $elemMatch: { id: 1 } },
+    });
+    res.json({
+      statut: "success",
+      message: "Nombre de clients récupérés avec succès",
+      data: { nbClients },
     });
   } catch (error) {
     res.status(500).json({
@@ -189,6 +230,32 @@ const setRoleMecanicien = async (req, res) => {
       });
     }
     utilisateur.role = [{ id: 2, label: "mecanicien" }];
+    await utilisateur.save();
+    res.json({
+      statut: "success",
+      message: "Rôle mis à jour avec succès",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const setRoleManager = async (req, res) => {
+  try {
+    const utilisateur = await Utilisateur.findById(req.params.id);
+    if (!utilisateur) {
+      return res.status(404).json({
+        statut: "error",
+        message: "Utilisateur non trouvé",
+        data: null,
+      });
+    }
+    utilisateur.role = [{ id: 3, label: "manager" }];
     await utilisateur.save();
     res.json({
       statut: "success",
@@ -268,6 +335,8 @@ module.exports = {
   updateUtilisateur,
   deleteUtilisateur,
   setRoleMecanicien,
+  setRoleManager,
   getMecaniciens,
-  getClients
+  getClients,
+  getNbClients,
 };

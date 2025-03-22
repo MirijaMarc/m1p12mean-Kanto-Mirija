@@ -6,6 +6,12 @@ const {
   getInterventionsDetails,
   getInterventionsDetailsByClient,
   getInterventionsDetailsByMecanicien,
+  getInterventionByStatut,
+  getTotalPrestations,
+  getTotalPrestationsParJour,
+  getTotalPrestationsParType,
+  calculMontantIntervention,
+  getTotalMontantInterventions,
 } = require("../services/interventionService");
 const { decodeToken } = require("../utils/jwt");
 
@@ -26,6 +32,7 @@ const newIntervention = async (req, res) => {
       description,
       clientId,
       statut: 1,
+      montant: await calculMontantIntervention(prestationsId)
     });
     await intervention.save();
     res.status(201).json({
@@ -82,7 +89,9 @@ const getInterventionsByMecanicien = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
     const mecanicienId = decodeToken(token);
-    const interventions = await getInterventionsDetailsByMecanicien(mecanicienId);
+    const interventions = await getInterventionsDetailsByMecanicien(
+      mecanicienId
+    );
     res.json({
       statut: "success",
       message: "Interventions récupérées avec succès",
@@ -134,6 +143,96 @@ const getProchaineIntervention = async (req, res) => {
   }
 };
 
+const getNbInterventionByStatut = async (req, res) => {
+  try {
+    const nbInterventionByStatut = await getInterventionByStatut();
+    res.json({
+      statut: "success",
+      message: "Nombre d'interventions par statut récupéré avec succès",
+      data: {
+        enattente: nbInterventionByStatut.statut_1,
+        encours: nbInterventionByStatut.statut_2,
+        annulee: nbInterventionByStatut.statut_3,
+        terminee: nbInterventionByStatut.statut_4,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getNbTotalPrestations = async (req, res) => {
+  try {
+    const nbTotalPrestations = await getTotalPrestations();
+    res.json({
+      statut: "success",
+      message: "Nombre total de prestations récupéré avec succès",
+      data: { nbTotalPrestations },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getMontantTotalPrestations = async (req, res) => {
+  try {
+    const nbTotalPrestations = await getTotalMontantInterventions();
+    res.json({
+      statut: "success",
+      message: "Nombre total de prestations récupéré avec succès",
+      data: { nbTotalPrestations },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getNbTotalPrestationsParJour = async (req, res) => {
+  try {
+    const nbTotalPrestationsParJour = await getTotalPrestationsParJour();
+    res.json({
+      statut: "success",
+      message: "Nombre total de prestations récupéré avec succès",
+      data: { nbTotalPrestationsParJour },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getNbTotalPrestationsParType = async (req, res) => {
+  try {
+    const nbTotalPrestationsParType = await getTotalPrestationsParType();
+    res.json({
+      statut: "success",
+      message: "Nombre total de prestations récupéré avec succès",
+      data: { nbTotalPrestationsParType },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 const assignerMecaniciensIntervention = async (req, res) => {
   try {
     const { mecaniciensId } = req.body;
@@ -160,7 +259,6 @@ const assignerMecaniciensIntervention = async (req, res) => {
     });
   }
 };
-
 
 const annulerIntervention = async (req, res) => {
   try {
@@ -308,5 +406,10 @@ module.exports = {
   terminerIntervention,
   getInterventionsByClient,
   getInterventionsByMecanicien,
-  assignerMecaniciensIntervention
+  assignerMecaniciensIntervention,
+  getNbInterventionByStatut,
+  getNbTotalPrestations,
+  getNbTotalPrestationsParJour,
+  getNbTotalPrestationsParType,
+  getTotalMontantInterventions
 };
