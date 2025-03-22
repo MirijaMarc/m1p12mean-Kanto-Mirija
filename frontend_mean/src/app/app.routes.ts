@@ -12,6 +12,7 @@ import { PrestationComponent } from './features/utilitaires/prestation/prestatio
 import { VoitureComponent } from './features/utilitaires/voiture/voiture.component';
 import { UtilisateurComponent } from './features/utilitaires/utilisateur/utilisateur.component';
 import { NotificationComponent } from './features/notification/notification.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -19,6 +20,7 @@ export const routes: Routes = [
     {
       path: '',
       component: LayoutComponent,
+      canActivate: [authGuard],
       children: [
         { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         { path: 'intervention', component: InterventionComponent },

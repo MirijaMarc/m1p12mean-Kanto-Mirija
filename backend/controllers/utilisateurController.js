@@ -65,7 +65,7 @@ const connexion = async (req, res) => {
       });
     }
 
-    const token = generateToken(utilisateur._id);
+    const token = generateToken(utilisateur);
 
     res.status(200).json({
       statut: "success",
