@@ -51,7 +51,12 @@ export class LoginComponent {
     this.authService.login(email, motDePasse).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['dashboard']);
+        const role = this.authService.getRole();
+        if (role == "manager"){
+          this.router.navigate(['dashboard']);
+        }else{
+          this.router.navigate(['intervention']);
+        }
       },
       error: (err : any) => {
         console.log(err);

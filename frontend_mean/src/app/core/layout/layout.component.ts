@@ -6,6 +6,8 @@ import { faChartLine,faWrench,faHandshake,faTasks , faCalendarCheck, faCalendarA
 import { initFlowbite } from 'flowbite';
 import { Flowbite } from '../decorator/flowbite.decorator';
 import { AuthService } from '../../shared/services/auth/auth.service';
+import Utilisateur from '../../models/utilisateur.model';
+import { environnement } from '../../environnement/environnement';
 @Component({
   selector: 'app-layout',
   imports: [
@@ -35,10 +37,18 @@ export class LayoutComponent {
   faHandshake = faHandshake;
   faTasks = faTasks;
 
+  env = environnement;
+  user!: Utilisateur
+  role: string
+
   constructor(
     private authService: AuthService,
     private router: Router
-  ) { }
+  ) {
+    this.role = this.authService.getRole()!;
+    this.user = this.authService.getUser()!;
+
+  }
 
   ngOnInit() {
     initFlowbite()

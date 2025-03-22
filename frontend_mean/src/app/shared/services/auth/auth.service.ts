@@ -21,6 +21,11 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+
+  signup(data :any){
+    return this.http.post(API.AUTH.SIGNUP, data)
+  }
+
   login(username : string, password: string): Observable<any> {
     let utilisateur : UtilisateurDTO = {
       email: username,
@@ -34,6 +39,8 @@ export class AuthService {
         })
       );
   }
+
+
 
   public saveToken(token: string): void {
     localStorage.setItem(this.tokenKey, token);

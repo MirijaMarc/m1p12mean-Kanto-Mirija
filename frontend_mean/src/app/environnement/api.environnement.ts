@@ -5,7 +5,7 @@ const env = environnement;
 export const API = {
   AUTH: {
     LOGIN:`${env.apiUrl}/utilisateurs/connexion`,
-    LOGOUT:""
+    SIGNUP: `${env.apiUrl}/utilisateurs`,
   },
   UTILISATEUR: {
     MECANICIEN:{

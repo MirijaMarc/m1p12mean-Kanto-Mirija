@@ -13,10 +13,13 @@ import { VoitureComponent } from './features/utilitaires/voiture/voiture.compone
 import { UtilisateurComponent } from './features/utilitaires/utilisateur/utilisateur.component';
 import { NotificationComponent } from './features/notification/notification.component';
 import { authGuard } from './core/guards/auth.guard';
+import { ForbiddenComponent } from './shared/components/forbidden/forbidden.component';
+import { roleGuard } from './core/guards/role/role.guard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
+    { path: 'forbidden', component: ForbiddenComponent },
     {
       path: '',
       component: LayoutComponent,
@@ -24,14 +27,14 @@ export const routes: Routes = [
       children: [
         { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         { path: 'intervention', component: InterventionComponent },
-        { path: 'dashboard', component: DashboardComponent },
+        { path: 'dashboard', component: DashboardComponent, data: { expectedRole: ['manager'] }, canActivate: [roleGuard] },
         { path: 'calendrier', component: CalendrierComponent },
         { path: 'detail-intervention/:id', component: DetailInterventionComponent },
-        { path: 'client', component: ClientComponent },
-        { path: 'mecanicien', component: MecanicienComponent },
-        { path: 'prestation', component: PrestationComponent },
-        { path: 'voiture', component: VoitureComponent },
-        { path: 'utilisateur', component: UtilisateurComponent},
+        { path: 'client', component: ClientComponent,  data: { expectedRole: ['manager'] }, canActivate: [roleGuard] },
+        { path: 'mecanicien', component: MecanicienComponent,  data: { expectedRole: ['manager'] }, canActivate: [roleGuard] },
+        { path: 'prestation', component: PrestationComponent,  data: { expectedRole: ['manager'] }, canActivate: [roleGuard] },
+        { path: 'voiture', component: VoitureComponent,  data: { expectedRole: ['manager'] }, canActivate: [roleGuard] },
+        { path: 'utilisateur', component: UtilisateurComponent,  data: { expectedRole: ['manager'] }, canActivate: [roleGuard]},
         { path: 'notification', component: NotificationComponent},
       ]
     }
