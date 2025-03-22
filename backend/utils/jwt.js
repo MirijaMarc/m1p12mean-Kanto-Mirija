@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
+require("dotenv").config();
 
 const generateToken = (utilisateur) => {
   const utilisateurDTO = {
@@ -18,10 +18,39 @@ const generateToken = (utilisateur) => {
 const decodeToken = (token) => {
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    return decodedToken.id; 
+    return decodedToken.id;
   } catch (error) {
-    throw new Error('Token invalide ou expiré');
+    throw new Error("Token invalide ou expiré");
   }
 };
 
-module.exports = { generateToken, decodeToken };
+const verifyRole = (allowedRoles) => {
+  return (req, res, next) => {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ statut: "error", message: "Token manquant" });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return res
+          .status(403)
+          .json({ statut: "error", message: "Token invalide" });
+      }
+
+      if (!allowedRoles.includes(decoded.role)) {
+        return res
+          .status(403)
+          .json({ statut: "error", message: "Accès refusé, rôle insuffisant" });
+      }
+
+      req.user = decoded;
+      next();
+    });
+  };
+};
+
+module.exports = { generateToken, decodeToken, verifyRole };

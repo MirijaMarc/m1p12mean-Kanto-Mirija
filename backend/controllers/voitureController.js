@@ -7,30 +7,40 @@ const createVoiture = async (req, res) => {
     res.status(201).json({
       statut: "success",
       message: "Voiture créée avec succès",
-      data: voiture
+      data: voiture,
     });
   } catch (error) {
     res.status(400).json({
       statut: "error",
       message: error.message,
-      data: null
+      data: null,
     });
   }
 };
 
 const getVoitures = async (req, res) => {
   try {
-    const voitures = await Voiture.find({ deletedAt: null });
+    const { recherche } = req.query;
+    let condition = { deletedAt: null };
+
+    if (recherche) {
+      condition = {
+        ...condition,
+        $or: [{ marque: { $regex: recherche, $options: "i" } }],
+      };
+    }
+
+    const voitures = await Voiture.find(condition);
     res.json({
       statut: "success",
       message: "Voitures récupérées avec succès",
-      data: voitures
+      data: voitures,
     });
   } catch (error) {
     res.status(500).json({
       statut: "error",
       message: error.message,
-      data: null
+      data: null,
     });
   }
 };
@@ -42,19 +52,19 @@ const getVoitureById = async (req, res) => {
       return res.status(404).json({
         statut: "error",
         message: "Voiture non trouvée",
-        data: null
+        data: null,
       });
     }
     res.json({
       statut: "success",
       message: "Voiture récupérée avec succès",
-      data: voiture
+      data: voiture,
     });
   } catch (error) {
     res.status(500).json({
       statut: "error",
       message: error.message,
-      data: null
+      data: null,
     });
   }
 };
@@ -62,25 +72,25 @@ const getVoitureById = async (req, res) => {
 const updateVoiture = async (req, res) => {
   try {
     const voiture = await Voiture.findByIdAndUpdate(req.params.id, req.body, {
-      new: true
+      new: true,
     });
     if (!voiture) {
       return res.status(404).json({
         statut: "error",
         message: "Voiture non trouvée",
-        data: null
+        data: null,
       });
     }
     res.json({
       statut: "success",
       message: "Voiture mis à jour avec succès",
-      data: voiture
+      data: voiture,
     });
   } catch (error) {
     res.status(400).json({
       statut: "error",
       message: error.message,
-      data: null
+      data: null,
     });
   }
 };
@@ -92,7 +102,7 @@ const deleteVoiture = async (req, res) => {
       return res.status(404).json({
         statut: "error",
         message: "Voiture non trouvé",
-        data: null
+        data: null,
       });
     }
     voiture.deletedAt = new Date();
@@ -100,13 +110,13 @@ const deleteVoiture = async (req, res) => {
     res.json({
       statut: "success",
       message: "Voiture supprimée avec succès",
-      data: null
+      data: null,
     });
   } catch (error) {
     res.status(500).json({
       statut: "error",
       message: error.message,
-      data: null
+      data: null,
     });
   }
 };

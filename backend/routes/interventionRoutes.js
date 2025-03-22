@@ -12,6 +12,11 @@ const {
   getInterventionsByClient,
   getInterventionsByMecanicien,
   assignerMecaniciensIntervention,
+  getNbInterventionByStatut,
+  getNbTotalPrestations,
+  getNbTotalPrestationsParJour,
+  getNbTotalPrestationsParType,
+  getTotalMontantInterventions,
 } = require("../controllers/interventionController");
 
 const router = express.Router();
@@ -19,6 +24,11 @@ const router = express.Router();
 router.get("/prochaine", getProchaineIntervention);
 router.get("/client", getInterventionsByClient);
 router.get("/mecanicien", getInterventionsByMecanicien);
+router.get("/nb-prestations", getNbTotalPrestations);
+router.get("/nb-prestations-jour", getNbTotalPrestationsParJour);
+router.get("/nb-prestations-type", getNbTotalPrestationsParType);
+router.get("/montant-total", getTotalMontantInterventions);
+router.get("/nb-statut", getNbInterventionByStatut);
 router.patch("/:id/mecaniciens", assignerMecaniciensIntervention);
 router.post("/", newIntervention);
 router.get("/", getInterventions);
