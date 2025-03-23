@@ -9,15 +9,19 @@ export const API = {
   },
   UTILISATEUR: {
     MECANICIEN:{
-
+      GET: env.apiUrl + '/utilisateurs/mecaniciens?recherche=##&page=###',
     },
-    GET: env.apiUrl + '/utilisateurs',
+    CLIENT:{
+      GET: env.apiUrl + '/utilisateurs/clients?recherche=##&page=###',
+    },
+    GET: env.apiUrl + '/utilisateurs?recherche=##&page=###',
+    NEW: env.apiUrl + '/utilisateurs/new',
     POST: env.apiUrl + '/utilisateurs',
     PUT: env.apiUrl + '/utilisateurs/##',
     DELETE: env.apiUrl + '/utilisateurs/##',
   },
   VOITURE:{
-    GET: env.apiUrl + '/voitures',
+    GET: env.apiUrl + '/voitures?recherche=##&page=###',
     POST: env.apiUrl + '/voitures',
     PUT: env.apiUrl + '/voitures/##',
     DELETE: env.apiUrl + '/voitures/##',
@@ -26,7 +30,7 @@ export const API = {
 
   },
   PRESTATION:{
-    GET: env.apiUrl + '/prestations',
+    GET: env.apiUrl + '/prestations?recherche=##&page=###',
     POST: env.apiUrl + '/prestations',
     PUT: env.apiUrl + '/prestations/##',
     DELETE: env.apiUrl + '/prestations/##',

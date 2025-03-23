@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { Flowbite } from '../../../core/decorator/flowbite.decorator';
 import { initFlowbite } from 'flowbite';
 import Utilisateur from '../../../models/utilisateur.model';
-import { testUtilisateur } from '../../../data/data';
+
 @Component({
   selector: 'app-client',
   imports: [
@@ -18,6 +18,6 @@ export class ClientComponent {
   clients!: Utilisateur[]
   ngOnInit(){
     initFlowbite();
-    this.clients = testUtilisateur;
+    // this.clients = testUtilisateur;
   }
 }
