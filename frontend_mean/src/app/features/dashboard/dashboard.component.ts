@@ -4,6 +4,21 @@ import { initFlowbite } from 'flowbite';
 import { ApexAxisChartSeries, ApexChart, ApexDataLabels, ApexTitleSubtitle, ApexXAxis, NgApexchartsModule } from 'ng-apexcharts';
 import { CommonModule } from '@angular/common';
 
+interface DashboardCardData{
+  nbInterventionRealise: number;
+  chiffreAffaire: number;
+  nombreClient: number;
+}
+
+
+interface DashboardGraphData{
+  repartitionIntervention: number[];
+  repartitionPrestation: number[];
+  chiffreAffaire: number[];
+}
+
+
+
 interface ChartOptions {
   series: ApexAxisChartSeries | number[];
   chart: ApexChart;
@@ -26,8 +41,17 @@ export class DashboardComponent {
   CAChartOptions!: ChartOptions;
   pieChartOptions!: ChartOptions;
 
+  dashboardCardData! :DashboardCardData
+  dashboardGraphData! :DashboardGraphData
+
   constructor() {
-    // 📌 Définition des options des graphiques avec l'interface ChartOptions
+
+  }
+
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    initFlowbite ()
     this.InterventionbBarChartOptions = {
       series: [{ name: 'Ventes', data: [44, 55, 13, 43, 22, 23, 35, 28, 41, 22,32,56] }],
       chart: { type: 'bar', height: 350 },
@@ -50,11 +74,5 @@ export class DashboardComponent {
       xaxis: { categories: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juillet', 'Aout', 'Sept', 'Oct', 'Nov', 'Dec'] },
       dataLabels: { enabled: false }
     };
-  }
-
-  ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    initFlowbite ()
   }
 }

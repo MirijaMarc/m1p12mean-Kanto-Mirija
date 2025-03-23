@@ -30,5 +30,12 @@ export const API = {
     POST: env.apiUrl + '/prestations',
     PUT: env.apiUrl + '/prestations/##',
     DELETE: env.apiUrl + '/prestations/##',
+  },
+  DASHBOARD: {
+    NB_INTERVENTION_REALISE: env.apiUrl + '/dashboard/nbInterventionRealise',
+    CHIFFRE_AFFAIRE: env.apiUrl + '/interventions/montant-total',
+    REPARTITION_INTERVENTION: env.apiUrl + '/dashboard/repartitionIntervention',
+    REPARTITION_PRESTATION: env.apiUrl + '/interventions/nb-prestations-type',
+    CHIFFRE_AFFAIRE_GRAPH: env.apiUrl + '/dashboard/chiffreAffaireGraph',
   }
 }
