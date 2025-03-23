@@ -20,7 +20,7 @@ const createVoiture = async (req, res) => {
 
 const getVoitures = async (req, res) => {
   try {
-    const { recherche } = req.query;
+    const { recherche, page = 1, limit = 10 } = req.query;
     let condition = { deletedAt: null };
 
     if (recherche) {
@@ -30,11 +30,22 @@ const getVoitures = async (req, res) => {
       };
     }
 
-    const voitures = await Voiture.find(condition);
+    const skip = (page - 1) * limit;
+    const voitures = await Voiture.find(condition)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalVoitures = await Voiture.countDocuments(condition);
+
     res.json({
       statut: "success",
       message: "Voitures récupérées avec succès",
       data: voitures,
+      pagination: {
+        total: totalVoitures,
+        page: Number(page),
+        totalPages: Math.ceil(totalVoitures / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -44,6 +55,7 @@ const getVoitures = async (req, res) => {
     });
   }
 };
+
 
 const getVoitureById = async (req, res) => {
   try {

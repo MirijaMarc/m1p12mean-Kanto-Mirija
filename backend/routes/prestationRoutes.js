@@ -5,7 +5,6 @@ const {
   getPrestationById,
   updatePrestation,
   deletePrestation,
-  recherchePrestations,
 } = require("../controllers/prestationController");
 
 const router = express.Router();
