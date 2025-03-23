@@ -8,13 +8,15 @@ import { Flowbite } from '../decorator/flowbite.decorator';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import Utilisateur from '../../models/utilisateur.model';
 import { environnement } from '../../environnement/environnement';
+import { ToastModule } from 'primeng/toast';
 @Component({
   selector: 'app-layout',
   imports: [
     RouterOutlet,
     CommonModule,
     RouterModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    ToastModule
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
