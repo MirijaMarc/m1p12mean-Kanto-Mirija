@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 
 const createPrestation = async (req, res) => {
   try {
-    const { label, tarif } = req.body;
-    const prestation = new Prestation({ label, tarifs: [{ montant: tarif }] });
+    const { label, tarif, description, duree } = req.body;
+    const prestation = new Prestation({ label, tarifs: [{ montant: tarif }], description, duree });
     await prestation.save();
     res.status(201).json({
       statut: "success",
@@ -22,7 +22,7 @@ const createPrestation = async (req, res) => {
 
 const getPrestations = async (req, res) => {
   try {
-    const { recherche } = req.query;
+    const { recherche, page = 1, limit = 10 } = req.query;
     let condition = { deletedAt: null };
 
     if (recherche) {
@@ -32,6 +32,7 @@ const getPrestations = async (req, res) => {
       };
     }
 
+    const skip = (page - 1) * limit;
     const prestations = await Prestation.aggregate([
       { $match: condition },
       {
@@ -39,12 +40,21 @@ const getPrestations = async (req, res) => {
           tarifRecent: { $arrayElemAt: ["$tarifs.montant", -1] },
         },
       },
+      { $skip: skip },
+      { $limit: Number(limit) },
     ]);
+
+    const totalPrestations = await Prestation.countDocuments(condition);
 
     res.json({
       statut: "success",
       message: "Prestations récupérées avec succès",
       data: prestations,
+      pagination: {
+        total: totalPrestations,
+        page: Number(page),
+        totalPages: Math.ceil(totalPrestations / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -54,6 +64,7 @@ const getPrestations = async (req, res) => {
     });
   }
 };
+
 
 
 const getPrestationById = async (req, res) => {
@@ -88,14 +99,14 @@ const getPrestationById = async (req, res) => {
 
 const updatePrestation = async (req, res) => {
   try {
-    const { label, tarif } = req.body;
+    const { label, tarif, description, duree } = req.body;
     const prestation = await Prestation.findById(req.params.id);
     if (!prestation) {
       return res.status(404).json({ message: "Prestation non trouvée" });
     }
-    if (label) {
-      prestation.label = label;
-    }
+    if (label) prestation.label = label;
+    if (description) prestation.description = description;
+    if (duree) prestation.duree = duree;
 
     const dernierTarif =
       prestation.tarifs.length > 0

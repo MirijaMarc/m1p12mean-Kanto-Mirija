@@ -11,10 +11,12 @@ const {
   getClients,
   getNbClients,
   setRoleManager,
+  newUtilisateur,
 } = require("../controllers/utilisateurController");
 
 const router = express.Router();
 
+router.post("/new", newUtilisateur);
 router.post("/connexion", connexion);
 router.get("/mecaniciens", getMecaniciens);
 router.get("/clients", getClients);
