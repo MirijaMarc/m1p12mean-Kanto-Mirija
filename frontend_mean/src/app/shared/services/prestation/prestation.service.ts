@@ -12,6 +12,10 @@ export class PrestationService {
   ) { }
 
 
+  getAllPrestations(){
+    return this.http.get(API.PRESTATION.ALL)
+  }
+
   getPrestations(recherche: string, page : number){
     return this.http.get(API.PRESTATION.GET.replace('##', recherche).replace('###', page.toString()))
   }

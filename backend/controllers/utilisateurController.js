@@ -231,6 +231,42 @@ const getMecaniciens = async (req, res) => {
   }
 };
 
+const getAllMecaniciens = async (req, res) => {
+  try {
+    let condition = { deletedAt: null, role: { $elemMatch: { id: 2 } } };
+
+    const utilisateurs = await Utilisateur.find(condition)
+      .select("-motDePasse");
+
+    const totalMecaniciens = await Utilisateur.countDocuments(condition);
+
+    const mecaniciens = await Promise.all(
+      utilisateurs.map(async (mecanicien) => {
+        const interventionEnCours = await interventionEnCoursByMecanicien(
+          mecanicien._id
+        );
+
+        return {
+          ...mecanicien.toObject(),
+          interventionEnCours,
+        };
+      })
+    );
+
+    res.json({
+      statut: "success",
+      message: "Mecaniciens récupérés avec succès",
+      data: mecaniciens
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 
 const getClients = async (req, res) => {
   try {
@@ -265,6 +301,29 @@ const getClients = async (req, res) => {
         page: Number(page),
         totalPages: Math.ceil(totalClients / limit),
       },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+
+const getAllClients = async (req, res) => {
+  try {
+    let condition = { deletedAt: null, role: { $elemMatch: { id: 1 } } };
+    const clients = await Utilisateur.find(condition)
+      .select("-motDePasse");
+
+    const totalClients = await Utilisateur.countDocuments(condition);
+
+    res.json({
+      statut: "success",
+      message: "Clients récupérés avec succès",
+      data: clients,
     });
   } catch (error) {
     res.status(500).json({
@@ -458,4 +517,6 @@ module.exports = {
   getMecaniciens,
   getClients,
   getNbClients,
+  getAllMecaniciens,
+  getAllClients
 };

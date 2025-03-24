@@ -3,6 +3,8 @@ import { Flowbite } from '../../core/decorator/flowbite.decorator';
 import { initFlowbite } from 'flowbite';
 import { ApexAxisChartSeries, ApexChart, ApexDataLabels, ApexTitleSubtitle, ApexXAxis, NgApexchartsModule } from 'ng-apexcharts';
 import { CommonModule } from '@angular/common';
+import { DashboardService } from '../../shared/services/dashboard/dashboard.service';
+import { MessageService } from 'primeng/api';
 
 interface DashboardCardData{
   nbInterventionRealise: number;
@@ -44,13 +46,15 @@ export class DashboardComponent {
   dashboardCardData! :DashboardCardData
   dashboardGraphData! :DashboardGraphData
 
-  constructor() {
+  constructor(
+    private dashboardService: DashboardService,
+    private messageService : MessageService
+  ) {
 
   }
 
   ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
+
     initFlowbite ()
     this.InterventionbBarChartOptions = {
       series: [{ name: 'Ventes', data: [44, 55, 13, 43, 22, 23, 35, 28, 41, 22,32,56] }],
@@ -74,5 +78,20 @@ export class DashboardComponent {
       xaxis: { categories: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juillet', 'Aout', 'Sept', 'Oct', 'Nov', 'Dec'] },
       dataLabels: { enabled: false }
     };
+
+    this.getDashboardCardData();
+  }
+
+
+  getDashboardCardData(){
+    this.dashboardService.getNbInterventionRealise().subscribe({
+      next: (data: any) => {
+        console.log(data);
+      },
+      error: (error: any) => {
+        console.error(error);
+        this.messageService.add({severity:'error', summary:'Erreur', detail:'Une erreur est survenue'});
+      }
+    })
   }
 }

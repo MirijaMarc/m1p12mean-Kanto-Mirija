@@ -91,10 +91,10 @@ export class UtilisateurComponent {
       this.messageService.add({severity:'error', summary:'Erreur', detail:'Veuillez remplir tous les champs'});
       return;
     }
-    const {id, label, description, tarif, duree} = this.formUpdate.value;
+    const { id,nom, email, roleId, telephone} = this.formUpdate.value;
     console.log(this.formUpdate.value);
 
-    this.utilisateurService.update({label, description, tarif, duree}, id).subscribe({
+    this.utilisateurService.update({nom, email, roleId, telephone}, id).subscribe({
       next: () => {
         this.messageService.add({severity:'success', summary:'Succès', detail:'Utilisateur modifiée'});
         this.getUtilisateurs();

@@ -12,6 +12,16 @@ export class UtilisateurService {
   ) { }
 
 
+  getAllClients(){
+    return this.http.get(API.UTILISATEUR.CLIENT.ALL);
+  }
+
+  
+  getAllMecaniciens(){
+    return this.http.get(API.UTILISATEUR.MECANICIEN.ALL);
+  }
+
+
   getClients(recherche: string, page : number){
     return this.http.get(API.UTILISATEUR.CLIENT.GET.replace('##', recherche).replace('###', page.toString()));
   }

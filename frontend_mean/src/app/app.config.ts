@@ -10,6 +10,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import { MessageService } from 'primeng/api';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +18,7 @@ export const appConfig: ApplicationConfig = {
      provideRouter(routes),
      provideAnimations(),  // Nécessaire pour les animations du calendrier
      importProvidersFrom(CalendarModule.forRoot({ provide: DateAdapter, useFactory: adapterFactory })),
+     importProvidersFrom(NgMultiSelectDropDownModule.forRoot()),
      provideHttpClient(),
      provideAnimationsAsync(),
      providePrimeNG({

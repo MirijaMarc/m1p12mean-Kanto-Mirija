@@ -12,6 +12,12 @@ export class VoitureService {
   ) { }
 
 
+
+  getAllVoitures(){
+    return this.http.get(API.VOITURE.ALL)
+  }
+
+
   getVoitures(recherche: string, page : number){
     return this.http.get(API.VOITURE.GET.replace('##', recherche).replace('###', page.toString()))
   }

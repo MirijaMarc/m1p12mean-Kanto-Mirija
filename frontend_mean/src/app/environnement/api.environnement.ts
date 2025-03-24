@@ -10,9 +10,11 @@ export const API = {
   UTILISATEUR: {
     MECANICIEN:{
       GET: env.apiUrl + '/utilisateurs/mecaniciens?recherche=##&page=###',
+      ALL: env.apiUrl + '/utilisateurs/all-mecaniciens',
     },
     CLIENT:{
       GET: env.apiUrl + '/utilisateurs/clients?recherche=##&page=###',
+      ALL: env.apiUrl + '/utilisateurs/all-clients',
     },
     GET: env.apiUrl + '/utilisateurs?recherche=##&page=###',
     NEW: env.apiUrl + '/utilisateurs/new',
@@ -25,18 +27,21 @@ export const API = {
     POST: env.apiUrl + '/voitures',
     PUT: env.apiUrl + '/voitures/##',
     DELETE: env.apiUrl + '/voitures/##',
+    ALL: env.apiUrl + '/voitures/all',
+
   },
   INTERVENTION:{
 
   },
   PRESTATION:{
     GET: env.apiUrl + '/prestations?recherche=##&page=###',
+    ALL: env.apiUrl + '/prestations/all',
     POST: env.apiUrl + '/prestations',
     PUT: env.apiUrl + '/prestations/##',
     DELETE: env.apiUrl + '/prestations/##',
   },
   DASHBOARD: {
-    NB_INTERVENTION_REALISE: env.apiUrl + '/dashboard/nbInterventionRealise',
+    NB_INTERVENTION_REALISE: env.apiUrl + '/interventions/total',
     CHIFFRE_AFFAIRE: env.apiUrl + '/interventions/montant-total',
     REPARTITION_INTERVENTION: env.apiUrl + '/dashboard/repartitionIntervention',
     REPARTITION_PRESTATION: env.apiUrl + '/interventions/nb-prestations-type',

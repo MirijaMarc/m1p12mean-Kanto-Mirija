@@ -1,4 +1,5 @@
 export default interface Utilisateur{
+    _id: string
     nom: string
     email: string
     motDePasse: string
