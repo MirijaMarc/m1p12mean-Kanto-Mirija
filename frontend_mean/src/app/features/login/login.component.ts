@@ -62,7 +62,7 @@ export class LoginComponent {
         console.log(err);
         this.isLoading = false;
         this.errorMessage = 'Email ou Mot de passe Invalide'; // Affiche un message d'erreur en cas d'échec
-        this.messageService.add({ severity: 'error', summary: 'Erreur d\' authentification', detail: this.errorMessage });
+        // this.messageService.add({ severity: 'error', summary: 'Erreur d\' authentification', detail: this.errorMessage });
       }
     });
 

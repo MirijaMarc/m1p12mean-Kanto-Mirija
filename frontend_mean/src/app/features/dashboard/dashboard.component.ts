@@ -5,6 +5,7 @@ import { ApexAxisChartSeries, ApexChart, ApexDataLabels, ApexTitleSubtitle, Apex
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../shared/services/dashboard/dashboard.service';
 import { MessageService } from 'primeng/api';
+import { ToastrService } from 'ngx-toastr';
 
 interface DashboardCardData{
   nbInterventionRealise: number;
@@ -48,7 +49,8 @@ export class DashboardComponent {
 
   constructor(
     private dashboardService: DashboardService,
-    private messageService : MessageService
+    private messageService : MessageService,
+    private toastr : ToastrService
   ) {
 
   }
@@ -90,7 +92,8 @@ export class DashboardComponent {
       },
       error: (error: any) => {
         console.error(error);
-        this.messageService.add({severity:'error', summary:'Erreur', detail:'Une erreur est survenue'});
+        // this.messageService.add({severity:'error', summary:'Erreur', detail:'Une erreur est survenue'});
+        this.toastr.error("Une erreur est survenue", "Erreur");
       }
     })
   }

@@ -6,6 +6,7 @@ import Prestation from '../../../models/prestation.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PrestationService } from '../../../shared/services/prestation/prestation.service';
 import { MessageService } from 'primeng/api';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-prestation',
@@ -30,7 +31,8 @@ export class PrestationComponent {
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private prestationService: PrestationService
+    private prestationService: PrestationService,
+    private toastr : ToastrService
   ) {
     this.form = this.fb.group({
       label: ['', Validators.required],
@@ -58,20 +60,21 @@ export class PrestationComponent {
 
   onSubmit(): void {
     if (this.form.invalid) {
-      this.messageService.add({severity:'error', summary:'Erreur', detail:'Veuillez remplir tous les champs'});
+      this.toastr.error('Veuillez remplir tous les champs', 'Erreur')
       return;
     }
 
     this.loadingAdd = true;
     this.prestationService.add(this.form.value).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Préstation ajoutée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Préstation ajoutée'});
+        this.toastr.success('Préstation ajoutéee', 'Succès')
         this.loadingAdd = false;
         this.getPrestations();
         this.form.reset();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
         this.loadingAdd = false;
       }
     });
@@ -79,7 +82,7 @@ export class PrestationComponent {
 
   onUpdate(): void {
     if (this.formUpdate.invalid) {
-      this.messageService.add({severity:'error', summary:'Erreur', detail:'Veuillez remplir tous les champs'});
+      this.toastr.error('Veuillez remplir tous les champs', 'Erreur')
       return;
     }
     const {id, label, description, tarif, duree} = this.formUpdate.value;
@@ -87,11 +90,12 @@ export class PrestationComponent {
 
     this.prestationService.update({label, description, tarif, duree}, id).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Préstation modifiée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Préstation modifiée'});
+        this.toastr.success('Préstation modifié', 'Succès')
         this.getPrestations();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
       }
     });
   }
@@ -100,11 +104,12 @@ export class PrestationComponent {
     const id = this.formDelete.value.id;
     this.prestationService.delete(id).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Préstation supprimée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Préstation supprimée'});
+        this.toastr.success('Préstation supprimé', 'Succès')
         this.getPrestations();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
       }
     });
   }
@@ -135,7 +140,7 @@ export class PrestationComponent {
         }, 500);
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
       }
     });
   }

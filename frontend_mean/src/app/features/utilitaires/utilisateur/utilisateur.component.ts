@@ -6,6 +6,7 @@ import Utilisateur from '../../../models/utilisateur.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { UtilisateurService } from '../../../shared/services/utilisateur/utilisateur.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 
@@ -33,7 +34,8 @@ export class UtilisateurComponent {
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private utilisateurService: UtilisateurService
+    private utilisateurService: UtilisateurService,
+    private toastr : ToastrService
   ) {
     this.form = this.fb.group({
       nom: ['', Validators.required],
@@ -63,24 +65,26 @@ export class UtilisateurComponent {
 
   onSubmit(): void {
     if (this.form.invalid) {
-      this.messageService.add({severity:'error', summary:'Erreur', detail:'Veuillez remplir tous les champs'});
+      this.toastr.error('Veuillez remplir tous les champs', 'Erreur')
       return;
     }
     if (this.form.value.motDePasse !== this.form.value.motDePasseConfirmation) {
-      this.messageService.add({severity:'error', summary:'Erreur', detail:'Les mots de passe ne correspondent pas'});
+      // this.messageService.add({severity:'error', summary:'Erreur', detail:'Les mots de passe ne correspondent pas'});
+      this.toastr.error('Les mots de passe ne correspondent pas', 'Erreur')
       return;
     }
 
     this.loadingAdd = true;
     this.utilisateurService.add(this.form.value).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Utilisateur ajoutée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Utilisateur ajoutée'});
+        this.toastr.success('Utilisateur ajoutée', 'Succès')
         this.loadingAdd = false;
         this.getUtilisateurs();
         this.form.reset();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
         this.loadingAdd = false;
       }
     });
@@ -88,7 +92,7 @@ export class UtilisateurComponent {
 
   onUpdate(): void {
     if (this.formUpdate.invalid) {
-      this.messageService.add({severity:'error', summary:'Erreur', detail:'Veuillez remplir tous les champs'});
+      this.toastr.error('Veuillez remplir tous les champs', 'Erreur')
       return;
     }
     const { id,nom, email, roleId, telephone} = this.formUpdate.value;
@@ -96,11 +100,13 @@ export class UtilisateurComponent {
 
     this.utilisateurService.update({nom, email, roleId, telephone}, id).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Utilisateur modifiée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Utilisateur modifiée'});
+        this.toastr.success('Utilisateur modifié', 'Succès')
+
         this.getUtilisateurs();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
       }
     });
   }
@@ -109,11 +115,12 @@ export class UtilisateurComponent {
     const id = this.formDelete.value.id;
     this.utilisateurService.delete(id).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Utilisateur supprimée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Utilisateur supprimée'});
+        this.toastr.success('Utilisateur supprimé', 'Succès')
         this.getUtilisateurs();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
       }
     });
   }
@@ -146,7 +153,7 @@ export class UtilisateurComponent {
         }, 500);
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
       }
     });
   }

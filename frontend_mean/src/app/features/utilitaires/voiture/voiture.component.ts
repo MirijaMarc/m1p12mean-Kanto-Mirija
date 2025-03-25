@@ -6,6 +6,7 @@ import Voiture from '../../../models/voiture.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { VoitureService } from '../../../shared/services/voiture/voiture.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-voiture',
@@ -30,7 +31,8 @@ export class VoitureComponent {
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private voitureService: VoitureService
+    private voitureService: VoitureService,
+    private toastr : ToastrService
   ) {
     this.form = this.fb.group({
       marque: ['', Validators.required]
@@ -52,20 +54,21 @@ export class VoitureComponent {
 
   onSubmit(): void {
     if (this.form.invalid) {
-      this.messageService.add({severity:'error', summary:'Erreur', detail:'Veuillez remplir tous les champs'});
+      this.toastr.error('Veuillez remplir tous les champs', 'Erreur')
       return;
     }
 
     this.loadingAdd = true;
     this.voitureService.add(this.form.value).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Voiture ajoutée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Voiture ajoutée'});
+        this.toastr.success('Voiture ajouté', 'Succès')
         this.loadingAdd = false;
         this.getVoitures();
         this.form.reset();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
         this.loadingAdd = false;
       }
     });
@@ -73,7 +76,7 @@ export class VoitureComponent {
 
   onUpdate(): void {
     if (this.formUpdate.invalid) {
-      this.messageService.add({severity:'error', summary:'Erreur', detail:'Veuillez remplir tous les champs'});
+      this.toastr.error('Veuillez remplir tous les champs', 'Erreur')
       return;
     }
     const {id, marque} = this.formUpdate.value;
@@ -81,11 +84,12 @@ export class VoitureComponent {
 
     this.voitureService.update({marque}, id).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Voiture modifiée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Voiture modifiée'});
+        this.toastr.success('Voiture modifié', 'Succès')
         this.getVoitures();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
       }
     });
   }
@@ -94,11 +98,12 @@ export class VoitureComponent {
     const id = this.formDelete.value.id;
     this.voitureService.delete(id).subscribe({
       next: () => {
-        this.messageService.add({severity:'success', summary:'Succès', detail:'Voiture supprimée'});
+        // this.messageService.add({severity:'success', summary:'Succès', detail:'Voiture supprimée'});
+        this.toastr.success('Voiture supprimé', 'Succès')
         this.getVoitures();
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')
       }
     });
   }
@@ -126,7 +131,7 @@ export class VoitureComponent {
         }, 500);
       },
       error: (error) => {
-        this.messageService.add({severity:'error', summary:'Erreur', detail:error.error.message});
+        this.toastr.error(error.error.message, 'Erreur')  
       }
     });
   }

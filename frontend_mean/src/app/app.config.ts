@@ -11,6 +11,8 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import { MessageService } from 'primeng/api';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { provideToastr } from 'ngx-toastr';
+import { Ng2CompleterModule } from 'ng2-completer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,9 +25,9 @@ export const appConfig: ApplicationConfig = {
      provideAnimationsAsync(),
      providePrimeNG({
          theme: {
-             preset: Aura
          }
      }),
-     MessageService
+     provideToastr(), // Toastr providers
+     MessageService,
     ]
 };
