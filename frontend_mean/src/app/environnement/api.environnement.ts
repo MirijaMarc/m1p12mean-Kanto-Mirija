@@ -31,6 +31,14 @@ export const API = {
 
   },
   INTERVENTION:{
+    POST : env.apiUrl + '/interventions',
+    GET : env.apiUrl + '/interventions?recherche=##&page=###',
+    PUT: env.apiUrl + '/interventions/##',
+    DELETE: env.apiUrl + '/interventions/##',
+    ASSIGN_MECANICIEN: env.apiUrl + '/interventions/##/mecaniciens',
+    ANNULER: env.apiUrl + '/interventions/##/annuler',
+    COMMENCER: env.apiUrl + '/interventions/##/commencer',
+    TEMRINER: env.apiUrl + '/interventions/##/terminer',
 
   },
   PRESTATION:{
