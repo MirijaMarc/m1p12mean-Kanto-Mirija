@@ -16,6 +16,7 @@ import { VoitureService } from '../../shared/services/voiture/voiture.service';
 import Voiture from '../../models/voiture.model';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import { ToastrService } from 'ngx-toastr';
+import { InterventionService } from '../../shared/services/intervention/intervention.service';
 
 
 @Component({
@@ -40,6 +41,13 @@ export class InterventionComponent {
     prestations : Prestation[] = [];
     voitures : Voiture[] = [];
     dropdownPrestationsSettings : IDropdownSettings = {};
+    formUpdate!: FormGroup
+    formDelete!: FormGroup
+    loadingAdd = false;
+    recherche: string = '';
+    page: number = 1;
+    pagination: any;
+    
 
 
 
@@ -49,7 +57,8 @@ export class InterventionComponent {
       private voitureService : VoitureService,
       private messageService : MessageService,
       private fb: FormBuilder,
-      private toastr: ToastrService 
+      private toastr: ToastrService,
+      private interventionService : InterventionService
     ){
       this.form = this.fb.group({
         prestationsId : ['', Validators.required],
@@ -68,6 +77,7 @@ export class InterventionComponent {
       this.getClients();
       this.getPrestations();
       this.getVoitures();
+      this.getInterventions();
       this.dropdownPrestationsSettings = {
         singleSelection: false,
         idField: '_id',
@@ -163,9 +173,107 @@ export class InterventionComponent {
       });
       this.form.value.prestationsId = realPrestationsId;
       console.log(this.form.value);
+      this.interventionService.add(this.form.value).subscribe({
+        next : (data : any) =>{
+          console.log(data);
+          this.toastr.success("Intervention ajoutée avec succès", "Succès");
+          this.form.reset();
+          this.getInterventions();
+        },
+        error : (err : any) =>{
+          console.error(err);
+          this.toastr.error("Une erreur est survenue", "Erreur");
+        }
+      }) 
+    
       
+    }
 
-      
+    onUpdate(): void {
+      if (this.formUpdate.invalid) {
+        // this.toastr.erro('Veuillez remplir tous les champs', 'Erreur')
+        this.toastr.error('Veuillez remplir tous les champs', "Erreur");
+  
+        return;
+      }
+      const { id, nom, email, roleId, telephone} = this.formUpdate.value;
+      console.log(this.formUpdate.value);
+  
+      this.utilisateurService.update({nom, email, roleId, telephone}, id).subscribe({
+        next: () => {
+          // this.messageService.add({severity:'success', summary:'Succès', detail:'Mécanicien modifiée'});
+          this.toastr.success('Mécanicien modifié', 'Succès')
+          this.getMecaniciens();
+        },
+        error: (error) => {
+          this.toastr.error(error.error.message, 'Erreur')
+        }
+      });
+    }
+  
+    onDelete(): void {
+      const id = this.formDelete.value.id;
+      this.utilisateurService.delete(id).subscribe({
+        next: () => {
+          // this.messageService.add({severity:'success', summary:'Succès', detail:'Mécanicien supprimé'});
+          this.toastr.success('Mécanicien supprimé', 'Succès')
+          this.getMecaniciens();
+        },
+        error: (error) => {
+          this.toastr.error(error.error.message, 'Erreur')
+        }
+      });
+    }
+  
+    openDeleteModal(item: any) {
+      this.formDelete.patchValue({ // Met à jour les valeurs du formulaire
+        id: item._id
+      });
+    }
+  
+    openEditModal(item: any) {
+      this.formUpdate.patchValue({ // Met à jour les valeurs du formulaire
+        id: item._id,
+        nom: item.nom,
+        email: item.email,
+        telephone: item.telephone
+      });
+    }
+  
+    getInterventions(): void {
+      this.interventionService.getInterventions(this.recherche, this.page).subscribe({
+        next: (data :any ) => {
+          this.interventions = data.data;
+          console.log('interventions ==>',data.data);
+          this.pagination = data.pagination;
+          setTimeout(() => {
+            initFlowbite();
+          }, 500);
+        },
+        error: (error) => {
+          this.toastr.error(error.error.message, 'Erreur')
+        }
+      });
+    }
+  
+  
+    onSearchChange(event: any): void {
+      this.recherche = event.target.value;
+      this.getInterventions();
+    }
+  
+    goToPreviousPage() {
+      if (this.page > 1) {
+        this.page--;
+        this.getInterventions();
+      }
+    }
+  
+    goToNextPage() {
+      if (this.page < this.pagination.totalPages) {
+        this.page++;
+        this.getInterventions();
+      }
     }
 
     

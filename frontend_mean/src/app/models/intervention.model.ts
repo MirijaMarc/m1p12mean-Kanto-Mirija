@@ -3,10 +3,11 @@ import Utilisateur from "./utilisateur.model"
 import Voiture from "./voiture.model"
 
 export default interface Intervention {
-    id: string
-    client: Utilisateur
-    mecaniciens: Utilisateur[]
-    prestations: Prestation[]
+    _id: string
+    clientId: Utilisateur
+    mecaniciensId: Utilisateur[]
+    prestationsId: Prestation[]
+    description: string
     voiture: Voiture
     dateIntervention: Date
     statut: number

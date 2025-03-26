@@ -22,8 +22,10 @@ const { decodeToken } = require("../utils/jwt");
 
 const newIntervention = async (req, res) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    let utilisateurId = decodeToken(token);
+    if (req.headers.authorization){
+      const token = req.headers.authorization.split(" ")[1];
+      var utilisateurId = decodeToken(token);
+    }
     const { prestationsId, marque, dateIntervention, description, clientId } =
       req.body;
     let voiture = await Voiture.findOne({ marque });
@@ -52,6 +54,8 @@ const newIntervention = async (req, res) => {
       data: intervention,
     });
   } catch (error) {
+    console.log(error);
+    
     res.status(400).json({
       statut: "error",
       message: error.message,
@@ -62,11 +66,22 @@ const newIntervention = async (req, res) => {
 
 const getInterventions = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { recherche, page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
+
 
     const totalInterventions = await Intervention.countDocuments({ deletedAt: null });
     const interventions = await Intervention.find({ deletedAt: null })
+      .populate({
+        path: "clientId",
+        select: "nom prenom email",
+        as : "client"
+      })
+      .populate({
+        path: "prestationsId",
+        select: "label",
+        as: "prestation",
+      })
       .skip(skip)
       .limit(Number(limit));
 
