@@ -4,4 +4,7 @@
 filter: blur(1px);
 pointer-events: none; /* Empêche l'interaction avec le contenu derrière */
 }
-  
+
+::ng-deep .filter-textbox {
+    color: #000 !important; /* Noir */
+  }

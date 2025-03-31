@@ -12,6 +12,8 @@ const {
   getNbClients,
   setRoleManager,
   newUtilisateur,
+  getAllMecaniciens,
+  getAllClients,
 } = require("../controllers/utilisateurController");
 
 const router = express.Router();
@@ -19,7 +21,9 @@ const router = express.Router();
 router.post("/new", newUtilisateur);
 router.post("/connexion", connexion);
 router.get("/mecaniciens", getMecaniciens);
+router.get("/all-mecaniciens", getAllMecaniciens);
 router.get("/clients", getClients);
+router.get("/all-clients", getAllClients);
 router.get("/clients/total", getNbClients);
 router.patch("/:id/set-mecanicien", setRoleMecanicien);
 router.patch("/:id/set-manager", setRoleManager);

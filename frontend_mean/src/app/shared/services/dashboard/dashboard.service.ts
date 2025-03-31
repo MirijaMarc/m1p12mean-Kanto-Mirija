@@ -1,35 +1,39 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { API } from '../../../environnement/api.environnement';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
 
-  constructor() { }
+  constructor(
+    private http : HttpClient
+  ) { }
 
-  getNbInterventionRealise(): number {
-    return 12;
+  getNbInterventionRealise(annee: string){
+    return this.http.get(API.DASHBOARD.NB_INTERVENTION_REALISE.replace('##', annee));
   }
 
-  getChiffreAffaire(): number {
-    return 1000;
+  getChiffreAffaire(annee: string) {
+    return this.http.get(API.DASHBOARD.CHIFFRE_AFFAIRE.replace('##', annee));
   }
 
-  getNombreClient(): number {
-    return 10;
+  getNombreClient(annee: string) {
+    return this.http.get(API.DASHBOARD.NB_CLIENTS.replace('##', annee));
   }
 
-  getRepartitionIntervention(): number[] {
-    return [44, 55, 13, 43, 22, 23, 35, 28, 41, 22,32,56];
+  getRepartitionIntervention(annee: string){
+    return this.http.get(API.DASHBOARD.REPARTITION_INTERVENTION.replace('##', annee));
   }
 
-  getRepartitionPrestation(): number[] {
-    return [44, 55, 13, 43, 22, 23, 35, 28, 41, 22,32,56];
+  getRepartitionPrestation(annee: string){
+    return this.http.get(API.DASHBOARD.REPARTITION_PRESTATION.replace('##', annee));
   }
 
-  getChiffreAffaireGraph(): number[] {
-    return [44, 55, 13, 43, 22, 23, 35, 28, 41, 22,32,56];
+  getChiffreAffaireGraph(annee: string){
+    return this.http.get(API.DASHBOARD.CHIFFRE_AFFAIRE_GRAPH.replace('##', annee));
   }
 
-  
+
 }

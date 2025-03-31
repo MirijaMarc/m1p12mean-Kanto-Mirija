@@ -44,7 +44,21 @@ const inscription = async (req, res) => {
 
 const newUtilisateur = async (req, res) => {
   try {
-    const { nom, email, roleId, roleLabel, telephone, motDePasse } = req.body;
+    const { nom, email, roleId, telephone, motDePasse } = req.body;
+    let roleLabel = "client";
+    switch (parseInt(roleId)) {
+      case 1:
+        roleLabel = "client";
+        break;
+      case 2:
+        roleLabel = "mecanicien";
+        break;
+      case 3:
+        roleLabel = "manager";
+        break;
+      default:
+        roleLabel = "client";
+    }
 
     const utilisateurExistant = await Utilisateur.findOne({ email });
     if (utilisateurExistant) {
@@ -120,13 +134,37 @@ const connexion = async (req, res) => {
 
 const getUtilisateurs = async (req, res) => {
   try {
-    const utilisateurs = await Utilisateur.find({ deletedAt: null }).select(
-      "-motDePasse"
-    );
+    const { recherche, page = 1, limit = 10 } = req.query;
+    let condition = { deletedAt: null };
+
+    if (recherche) {
+      condition = {
+        ...condition,
+        $or: [
+          { nom: { $regex: recherche, $options: "i" } },
+          { email: { $regex: recherche, $options: "i" } },
+          { telephone: { $regex: recherche, $options: "i" } }
+        ],
+      };
+    }
+
+    const skip = (page - 1) * limit;
+    const utilisateurs = await Utilisateur.find(condition)
+      .skip(skip)
+      .limit(Number(limit))
+      .select("-motDePasse");
+
+    const totalUtilisateurs = await Utilisateur.countDocuments(condition);
+
     res.json({
       statut: "success",
       message: "Utilisateurs récupérés avec succès",
       data: utilisateurs,
+      pagination: {
+        total: totalUtilisateurs,
+        page: Number(page),
+        totalPages: Math.ceil(totalUtilisateurs / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -148,6 +186,7 @@ const getMecaniciens = async (req, res) => {
         $or: [
           { nom: { $regex: recherche, $options: "i" } },
           { email: { $regex: recherche, $options: "i" } },
+          { telephone: { $regex: recherche, $options: "i" } }
         ],
       };
     }
@@ -192,6 +231,42 @@ const getMecaniciens = async (req, res) => {
   }
 };
 
+const getAllMecaniciens = async (req, res) => {
+  try {
+    let condition = { deletedAt: null, role: { $elemMatch: { id: 2 } } };
+
+    const utilisateurs = await Utilisateur.find(condition)
+      .select("-motDePasse");
+
+    const totalMecaniciens = await Utilisateur.countDocuments(condition);
+
+    const mecaniciens = await Promise.all(
+      utilisateurs.map(async (mecanicien) => {
+        const interventionEnCours = await interventionEnCoursByMecanicien(
+          mecanicien._id
+        );
+
+        return {
+          ...mecanicien.toObject(),
+          interventionEnCours,
+        };
+      })
+    );
+
+    res.json({
+      statut: "success",
+      message: "Mecaniciens récupérés avec succès",
+      data: mecaniciens
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 
 const getClients = async (req, res) => {
   try {
@@ -204,6 +279,7 @@ const getClients = async (req, res) => {
         $or: [
           { nom: { $regex: recherche, $options: "i" } },
           { email: { $regex: recherche, $options: "i" } },
+          { telephone: { $regex: recherche, $options: "i" } }
         ],
       };
     }
@@ -225,6 +301,29 @@ const getClients = async (req, res) => {
         page: Number(page),
         totalPages: Math.ceil(totalClients / limit),
       },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+
+const getAllClients = async (req, res) => {
+  try {
+    let condition = { deletedAt: null, role: { $elemMatch: { id: 1 } } };
+    const clients = await Utilisateur.find(condition)
+      .select("-motDePasse");
+
+    const totalClients = await Utilisateur.countDocuments(condition);
+
+    res.json({
+      statut: "success",
+      message: "Clients récupérés avec succès",
+      data: clients,
     });
   } catch (error) {
     res.status(500).json({
@@ -418,4 +517,6 @@ module.exports = {
   getMecaniciens,
   getClients,
   getNbClients,
+  getAllMecaniciens,
+  getAllClients
 };

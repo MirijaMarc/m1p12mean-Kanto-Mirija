@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
+import { ToastrService } from 'ngx-toastr';
 
 interface Notification {
   id: number;
@@ -19,7 +20,7 @@ interface Notification {
   templateUrl: './notification.component.html',
   styleUrl: './notification.component.scss'
 })
-export class NotificationComponent {
+export class NotificationComponent implements OnInit{
   faBell = faBell;
   notifications: Notification[] = [
     { id: 1, message: 'Nouvelle réunion prévue demain.', date: '2025-03-17 14:30', read: false },
@@ -32,6 +33,17 @@ export class NotificationComponent {
     { id: 9, message: 'Votre demande a été approuvée.', date: '2025-03-16 09:15', read: true },
     { id: 10, message: 'Mise à jour du projet en attente de validation.', date: '2025-03-15 18:45', read: false },
   ];
+
+  constructor(
+    private toastr: ToastrService
+  ){}
+
+
+  ngOnInit(): void {
+  }
+
+
+
 
   markAsRead(notification: Notification) {
     notification.read = true;

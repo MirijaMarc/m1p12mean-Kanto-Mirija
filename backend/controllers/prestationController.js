@@ -65,6 +65,36 @@ const getPrestations = async (req, res) => {
   }
 };
 
+const getAllPrestations = async (req, res) => {
+  try {
+
+    let condition = { deletedAt: null };
+
+    const prestations = await Prestation.aggregate([
+      { $match: condition },
+      {
+        $addFields: {
+          tarifRecent: { $arrayElemAt: ["$tarifs.montant", -1] },
+        },
+      }
+    ]);
+
+    const totalPrestations = await Prestation.countDocuments(condition);
+
+    res.json({
+      statut: "success",
+      message: "Prestations récupérées avec succès",
+      data: prestations
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 
 
 const getPrestationById = async (req, res) => {
@@ -161,4 +191,5 @@ module.exports = {
   getPrestationById,
   updatePrestation,
   deletePrestation,
+  getAllPrestations
 };

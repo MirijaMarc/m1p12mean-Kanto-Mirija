@@ -56,6 +56,29 @@ const getVoitures = async (req, res) => {
   }
 };
 
+const getAllVoitures = async (req, res) => {
+  try {
+    let condition = { deletedAt: null };
+
+    const voitures = await Voiture.find(condition)
+
+    const totalVoitures = await Voiture.countDocuments(condition);
+
+    res.json({
+      statut: "success",
+      message: "Voitures récupérées avec succès",
+      data: voitures,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+
 
 const getVoitureById = async (req, res) => {
   try {
@@ -139,4 +162,5 @@ module.exports = {
   getVoitureById,
   updateVoiture,
   deleteVoiture,
+  getAllVoitures
 };

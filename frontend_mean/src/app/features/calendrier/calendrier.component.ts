@@ -6,6 +6,13 @@ import { isSameDay, isSameMonth } from 'date-fns';
 import { BrowserModule } from '@angular/platform-browser';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import Intervention from '../../models/intervention.model';
+import { InterventionService } from '../../shared/services/intervention/intervention.service';
+import { AuthService } from '../../shared/services/auth/auth.service';
+import { initFlowbite } from 'flowbite';
+import { environnement } from '../../environnement/environnement';
+import { ToastrService } from 'ngx-toastr';
+import { colors } from '../../models/event_colors';
 
 @Component({
   selector: 'app-calendrier',
@@ -26,6 +33,22 @@ export class CalendrierComponent {
   selectedDate!: Date;
   faArrowLeft = faArrowLeft;
   faArrowRight = faArrowRight;
+
+  interventions : Intervention[] = [];
+  user : any;
+  role!: string;
+  env : any = environnement;
+
+  constructor(
+    private interventionService : InterventionService,
+    private authService : AuthService,
+    private toastr : ToastrService
+  ){
+    this.user = this.authService.getUser()!;
+    this.role = this.authService.getRole();
+    this.getInterventions();
+  }
+
 
   changeView(view: string): void {
     switch (view) {
@@ -105,5 +128,94 @@ export class CalendrierComponent {
   handleDayClick(day: CalendarMonthViewDay): void {
     this.selectedDate = day.date;
   }
+
+
+  getInterventions(): void {
+    if (this.role == this.env.role.mecanicien){
+      this.interventionService.getAllInterventionsByMecanicien().subscribe({
+        next: (data :any ) => {
+          this.interventions = data.data;
+          this.loadInterventions();
+          console.log('interventions ==>',data.data);
+          setTimeout(() => {
+          initFlowbite();
+        }, 500);
+      },
+          error: (error) => {
+          this.toastr.error(error.error.message, 'Erreur')
+        }
+      });
+    }else if (this.role == this.env.role.client){
+      this.interventionService.getAllInterventionsByClient().subscribe({
+        next: (data :any ) => {
+          this.interventions = data.data;
+          this.loadInterventions();
+          console.log('interventions ==>',data.data);
+          setTimeout(() => {
+          initFlowbite();
+        }, 500);
+        },
+        error: (error) => {
+          this.toastr.error(error.error.message, 'Erreur')
+        }
+      })
+    }else{
+      this.interventionService.getAllInterventions().subscribe({
+        next: (data :any ) => {
+          this.interventions = data.data;
+          this.loadInterventions();
+          console.log('interventions ==>',data.data);
+          setTimeout(() => {
+          initFlowbite();
+        }, 500);
+        },
+        error: (error) => {
+          this.toastr.error(error.error.message, 'Erreur')
+        }
+      })
+    }
+  }
+
+  loadInterventions() {
+    // Suppose que les dates sont bien formatées
+    this.events = this.interventions.map(intervention => {
+      let color;
+      let labelStatut;
+
+      switch (intervention.statut) {
+        case 1: // En attente
+          color = colors.yellow;
+          labelStatut = 'En attente';
+          break;
+        case 2: // Commencée
+          color = colors.blue;
+          labelStatut = 'Commencée';
+          break;
+        case 3: // Annulée
+          color = colors.red;
+          labelStatut = 'Annulée';
+          break;
+        case 4: // Terminée
+          color = colors.green;
+          labelStatut = 'Terminée';
+          break;
+        default:
+          color = colors.gray;
+      }
+
+      return {
+        start: new Date(intervention.dateIntervention),
+        title: `${intervention.clientId.nom} - ${labelStatut}`,
+        color,
+        meta: intervention
+      };
+    });
+
+
+  }
+
+
+
+
 
 }
