@@ -16,17 +16,20 @@ const {
   getTotalMontantInterventionsParMois,
   getTotalInterventionsRealisees,
   getTotalInterventionsParMois,
+  getAllInterventionsDetailsByClient,
+  getAllInterventionsDetailsByMecanicien
 } = require("../services/interventionService");
 const { newNotification } = require("../services/notificationService");
 const { decodeToken } = require("../utils/jwt");
 
 const newIntervention = async (req, res) => {
   try {
-    if (req.headers.authorization){
-      const token = req.headers.authorization.split(" ")[1];
-      var utilisateurId = decodeToken(token);
-    }
-    const { prestationsId, marque, dateIntervention, description, clientId } =
+    const token = req.headers.authorization.split(" ")[1];
+    console.log('token ==>', token);
+    var utilisateurId = decodeToken(token);
+    console.log('utilisateurId ==>', utilisateurId);
+
+    const { prestationsId, marque, dateIntervention, description, clientId = undefined } =
       req.body;
     let voiture = await Voiture.findOne({ marque });
     if (!voiture) {
@@ -64,6 +67,42 @@ const newIntervention = async (req, res) => {
   }
 };
 
+
+
+
+const getAllInterventions = async (req, res) => {
+  try {
+    const interventions = await Intervention.find({ deletedAt: null })
+    .populate({
+      path: "clientId",
+      select: "nom prenom email",
+      as : "client"
+    })
+    .populate({
+      path: "prestationsId",
+      select: "label",
+      as: "prestations",
+    })
+    .populate({
+      path: "mecaniciensId",
+      select: "nom prenom email",
+      as: "mecaniciens",
+    });
+    res.json({
+      statut: "success",
+      message: "Interventions récupérées avec succès",
+      data: interventions,
+    });
+  } catch (error) { 
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+
 const getInterventions = async (req, res) => {
   try {
     const { recherche, page = 1, limit = 10 } = req.query;
@@ -80,7 +119,12 @@ const getInterventions = async (req, res) => {
       .populate({
         path: "prestationsId",
         select: "label",
-        as: "prestation",
+        as: "prestations",
+      })
+      .populate({
+        path: "mecaniciensId",
+        select: "nom prenom email",
+        as: "mecaniciens",
       })
       .skip(skip)
       .limit(Number(limit));
@@ -104,6 +148,43 @@ const getInterventions = async (req, res) => {
   }
 };
 
+const getAllInterventionsByClient = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const clientId = decodeToken(token);
+    const interventions = await getAllInterventionsDetailsByClient(clientId);
+    res.json({
+      statut: "success",
+      message: "Interventions récupérées avec succès",
+      data: interventions,
+    });
+  } catch (error) { 
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });   
+  }
+};
+
+const getAllInterventionsByMecanicien = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const mecanicienId = decodeToken(token);
+    const interventions = await getAllInterventionsDetailsByMecanicien(mecanicienId);
+    res.json({  
+      statut: "success",
+      message: "Interventions récupérées avec succès",
+      data: interventions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
 
 const getInterventionsByClient = async (req, res) => {
   try {
@@ -356,7 +437,8 @@ const getNbTotalPrestationsParJour = async (req, res) => {
 
 const getNbTotalPrestationsParType = async (req, res) => {
   try {
-    const nbTotalPrestationsParType = await getTotalPrestationsParType();
+    const { annee } = req.query;
+    const nbTotalPrestationsParType = await getTotalPrestationsParType(annee);
     res.json({
       statut: "success",
       message: "Nombre total de prestations récupéré avec succès",
@@ -382,7 +464,11 @@ const assignerMecaniciensIntervention = async (req, res) => {
         data: null,
       });
     }
+    console.log(mecaniciensId, 'mecaniciensId');
+    
     intervention.mecaniciensId = mecaniciensId;
+    console.log(intervention, 'intervention');
+    
     await intervention.save();
     res.json({
       statut: "success",
@@ -560,5 +646,8 @@ module.exports = {
   getMontantTotalInterventions,
   getNbTotalInterventionsRealisees,
   getMontantTotalInterventionsParMois,
-  getNbTotalInterventionsParMois
+  getNbTotalInterventionsParMois,
+  getAllInterventionsByClient,
+  getAllInterventionsByMecanicien,
+  getAllInterventions
 };

@@ -11,29 +11,29 @@ export class DashboardService {
     private http : HttpClient
   ) { }
 
-  getNbInterventionRealise(){
-    return this.http.get(API.DASHBOARD.NB_INTERVENTION_REALISE);
+  getNbInterventionRealise(annee: string){
+    return this.http.get(API.DASHBOARD.NB_INTERVENTION_REALISE.replace('##', annee));
   }
 
-  getChiffreAffaire() {
-    return this.http.get(API.DASHBOARD.CHIFFRE_AFFAIRE);
+  getChiffreAffaire(annee: string) {
+    return this.http.get(API.DASHBOARD.CHIFFRE_AFFAIRE.replace('##', annee));
   }
 
-  getNombreClient() {
-    return 10;
+  getNombreClient(annee: string) {
+    return this.http.get(API.DASHBOARD.NB_CLIENTS.replace('##', annee));
   }
 
-  getRepartitionIntervention(){
-    return [44, 55, 13, 43, 22, 23, 35, 28, 41, 22,32,56];
+  getRepartitionIntervention(annee: string){
+    return this.http.get(API.DASHBOARD.REPARTITION_INTERVENTION.replace('##', annee));
   }
 
-  getRepartitionPrestation(){
-    return [44, 55, 13, 43, 22, 23, 35, 28, 41, 22,32,56];
+  getRepartitionPrestation(annee: string){
+    return this.http.get(API.DASHBOARD.REPARTITION_PRESTATION.replace('##', annee));
   }
 
-  getChiffreAffaireGraph(){
-    return [44, 55, 13, 43, 22, 23, 35, 28, 41, 22,32,56];
+  getChiffreAffaireGraph(annee: string){
+    return this.http.get(API.DASHBOARD.CHIFFRE_AFFAIRE_GRAPH.replace('##', annee));
   }
 
-  
+
 }

@@ -40,11 +40,10 @@ export class NotificationComponent implements OnInit{
 
 
   ngOnInit(): void {
-    this.toastr.success('Hello world!', 'Toastr fun!');
   }
 
 
-  
+
 
   markAsRead(notification: Notification) {
     notification.read = true;

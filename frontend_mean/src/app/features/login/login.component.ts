@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../shared/services/auth/auth.service';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -30,6 +31,7 @@ export class LoginComponent {
     private router: Router,
     private fb: FormBuilder,
     private messageService : MessageService,
+    private toastr: ToastrService
   ) {
     this.loginForm = this.fb.group({
       email: new FormControl(''),
@@ -63,6 +65,7 @@ export class LoginComponent {
         this.isLoading = false;
         this.errorMessage = 'Email ou Mot de passe Invalide'; // Affiche un message d'erreur en cas d'échec
         // this.messageService.add({ severity: 'error', summary: 'Erreur d\' authentification', detail: this.errorMessage });
+        this.toastr.error(this.errorMessage, 'Erreur');
       }
     });
 

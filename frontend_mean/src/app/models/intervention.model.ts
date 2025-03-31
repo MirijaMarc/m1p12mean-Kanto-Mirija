@@ -14,6 +14,8 @@ export default interface Intervention {
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
+    prestations: Prestation[]
+    labelStatut: string
 
 }
 

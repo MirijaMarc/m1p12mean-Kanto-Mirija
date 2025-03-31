@@ -38,7 +38,10 @@ export const API = {
     ASSIGN_MECANICIEN: env.apiUrl + '/interventions/##/mecaniciens',
     ANNULER: env.apiUrl + '/interventions/##/annuler',
     COMMENCER: env.apiUrl + '/interventions/##/commencer',
-    TEMRINER: env.apiUrl + '/interventions/##/terminer',
+    TERMINER: env.apiUrl + '/interventions/##/terminer',
+    BY_MECANICIEN: env.apiUrl + '/interventions/mecanicien?recherche=##&page=###',
+    BY_CLIENT: env.apiUrl + '/interventions/client?recherche=##&page=###',
+    BY_ID: env.apiUrl + '/interventions/##',
 
   },
   PRESTATION:{
@@ -49,10 +52,22 @@ export const API = {
     DELETE: env.apiUrl + '/prestations/##',
   },
   DASHBOARD: {
-    NB_INTERVENTION_REALISE: env.apiUrl + '/interventions/total',
-    CHIFFRE_AFFAIRE: env.apiUrl + '/interventions/montant-total',
-    REPARTITION_INTERVENTION: env.apiUrl + '/dashboard/repartitionIntervention',
-    REPARTITION_PRESTATION: env.apiUrl + '/interventions/nb-prestations-type',
-    CHIFFRE_AFFAIRE_GRAPH: env.apiUrl + '/dashboard/chiffreAffaireGraph',
+    NB_INTERVENTION_REALISE: env.apiUrl + '/interventions/total?annee=##',
+    CHIFFRE_AFFAIRE: env.apiUrl + '/interventions/montant-total?annee=##',
+    NB_CLIENTS: env.apiUrl + '/utilisateurs/clients/total?annee=##',
+    REPARTITION_INTERVENTION: env.apiUrl + '/interventions/total-mois?annee=##',
+    REPARTITION_PRESTATION: env.apiUrl + '/interventions/nb-prestations-type?annee=##',
+    CHIFFRE_AFFAIRE_GRAPH: env.apiUrl + '/interventions/montant-total-mois?annee=##',
+  },
+  CALENDRIER: {
+    ALL_INTERVENTIONS: env.apiUrl + '/interventions/all',
+    ALL_INTERVENTIONS_BY_CLIENT: env.apiUrl + '/interventions/all/client',
+    ALL_INTERVENTIONS_BY_MECANICIEN: env.apiUrl + '/interventions/all/mecanicien',
+  },
+  NOTIFICATION: {
+    GET: env.apiUrl + '/notifications',
+    GET_BY_UTILISATEUR: env.apiUrl + '/notifications/utilisateurs/##',
+    MARQUER_LU: env.apiUrl + '/notifications/##/lue',
+    TOUT_MARQUER_LU: env.apiUrl + '/notifications/utilisateurs/##/lues',
   }
 }

@@ -17,6 +17,8 @@ import Voiture from '../../models/voiture.model';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import { ToastrService } from 'ngx-toastr';
 import { InterventionService } from '../../shared/services/intervention/intervention.service';
+import { environnement } from '../../environnement/environnement';
+import { AuthService } from '../../shared/services/auth/auth.service';
 
 
 @Component({
@@ -41,13 +43,17 @@ export class InterventionComponent {
     prestations : Prestation[] = [];
     voitures : Voiture[] = [];
     dropdownPrestationsSettings : IDropdownSettings = {};
+    dropdownMecaniciensSettings : IDropdownSettings = {};
     formUpdate!: FormGroup
     formDelete!: FormGroup
     loadingAdd = false;
     recherche: string = '';
     page: number = 1;
     pagination: any;
-    
+    env : any = environnement
+    role!: string
+    formAssignMecaniciens!: FormGroup
+
 
 
 
@@ -58,14 +64,33 @@ export class InterventionComponent {
       private messageService : MessageService,
       private fb: FormBuilder,
       private toastr: ToastrService,
-      private interventionService : InterventionService
+      private interventionService : InterventionService,
+      private authService : AuthService
     ){
+      this.role = this.authService.getRole()!;
+      console.log('role ==>', this.role);
+
       this.form = this.fb.group({
         prestationsId : ['', Validators.required],
         marque : ['', Validators.required],
         dateIntervention : ['', Validators.required],
         description : ['', Validators.required],
-        clientId : ['', Validators.required]
+        clientId : [null]
+      })
+      this.formUpdate = this.fb.group({
+        id : ['', Validators.required],
+        prestationsId : ['', Validators.required],
+        marque : ['', Validators.required],
+        dateIntervention : ['', Validators.required],
+        description : ['', Validators.required],
+        clientId : [null]
+      })
+      this.formDelete = this.fb.group({
+        id : ['', Validators.required]
+      })
+      this.formAssignMecaniciens = this.fb.group({
+        id : ['', Validators.required],
+        mecaniciensId : ['', Validators.required]
       })
 
     }
@@ -87,17 +112,24 @@ export class InterventionComponent {
         itemsShowLimit: 3,
         allowSearchFilter: true,
       };
+      this.dropdownMecaniciensSettings = {
+        singleSelection: false,
+        idField: '_id',
+        textField: 'nom',
+        selectAllText: 'Select All',
+        unSelectAllText: 'UnSelect All',
+      };
     }
 
-    
-    
+
+
 
     getMecaniciens(){
       this.utilisateurService.getAllMecaniciens().subscribe({
         next : (data :any) =>{
           console.log(data);
           this.mecanciens= data.data
-          
+
         },
         error : (err : any) =>{
           console.error(err);
@@ -114,7 +146,7 @@ export class InterventionComponent {
         next : (data :any) =>{
           console.log(data);
           this.clients= data.data
-          
+
         },
         error : (err : any) =>{
           console.error(err);
@@ -158,11 +190,42 @@ export class InterventionComponent {
 
     }
 
+    assignerMecaniciensIntervention(idIntervention : string){
+      this.formAssignMecaniciens.patchValue({
+        id : idIntervention
+      })
+
+      if (this.formAssignMecaniciens.invalid){
+        this.toastr.error("Veuillez remplir tous les champs", "Erreur");
+        return;
+      }
+      const { id, mecaniciensId} = this.formAssignMecaniciens.value;
+      let realMecaniciensId : any = []
+      mecaniciensId.forEach((element : any) => {
+        realMecaniciensId.push(element._id)
+      });
+      console.log(realMecaniciensId, 'realMecaniciensId');
+
+      this.interventionService.assignerMecaniciensIntervention(id, {mecaniciensId : realMecaniciensId}).subscribe({
+        next : (data : any) =>{
+          console.log(data);
+          this.toastr.success("Mécaniciens assignés avec succès", "Succès");
+          this.getInterventions();
+        },
+        error : (err : any) =>{
+          console.error(err);
+          this.toastr.error("Une erreur est survenue", "Erreur");
+        }
+      })
+    }
+
     onSubmit(){
       if (this.form.invalid){
         this.toastr.error("Veuillez remplir tous les champs", "Erreur");
         return;
       }
+      console.log(this.form.value, 'form');
+
 
       if (this.form.value.marque instanceof Object){
         this.form.value.marque= this.form.value.marque.marque
@@ -184,91 +247,131 @@ export class InterventionComponent {
           console.error(err);
           this.toastr.error("Une erreur est survenue", "Erreur");
         }
-      }) 
-    
-      
+      })
+
+
     }
 
     onUpdate(): void {
-      if (this.formUpdate.invalid) {
-        // this.toastr.erro('Veuillez remplir tous les champs', 'Erreur')
-        this.toastr.error('Veuillez remplir tous les champs', "Erreur");
-  
+      if (this.formUpdate.invalid){
+        this.toastr.error("Veuillez remplir tous les champs", "Erreur");
         return;
       }
-      const { id, nom, email, roleId, telephone} = this.formUpdate.value;
+
+      if (this.formUpdate.value.marque instanceof Object){
+        this.formUpdate.value.marque= this.formUpdate.value.marque.marque
+      }
+      let realPrestationsId : any = []
+      this.formUpdate.value.prestationsId.forEach((element : any) => {
+        realPrestationsId.push(element._id)
+      });
+      this.formUpdate.value.prestationsId = realPrestationsId;
       console.log(this.formUpdate.value);
-  
-      this.utilisateurService.update({nom, email, roleId, telephone}, id).subscribe({
+      this.interventionService.update(this.formUpdate.value, this.formUpdate.value.id).subscribe({
         next: () => {
           // this.messageService.add({severity:'success', summary:'Succès', detail:'Mécanicien modifiée'});
-          this.toastr.success('Mécanicien modifié', 'Succès')
-          this.getMecaniciens();
+          this.toastr.success('Intervention modifiée', 'Succès')
+          this.getInterventions();
         },
         error: (error) => {
           this.toastr.error(error.error.message, 'Erreur')
         }
       });
     }
-  
+
     onDelete(): void {
       const id = this.formDelete.value.id;
-      this.utilisateurService.delete(id).subscribe({
+      this.interventionService.delete(id).subscribe({
         next: () => {
           // this.messageService.add({severity:'success', summary:'Succès', detail:'Mécanicien supprimé'});
-          this.toastr.success('Mécanicien supprimé', 'Succès')
-          this.getMecaniciens();
+          this.toastr.success('Intervention supprimée ', 'Succès')
+          this.getInterventions();
         },
         error: (error) => {
           this.toastr.error(error.error.message, 'Erreur')
         }
       });
     }
-  
+
     openDeleteModal(item: any) {
       this.formDelete.patchValue({ // Met à jour les valeurs du formulaire
         id: item._id
       });
     }
-  
+
     openEditModal(item: any) {
+      const date = new Date(item.dateIntervention);
+      const localDateTime = date.toISOString().slice(0, 16);
+
       this.formUpdate.patchValue({ // Met à jour les valeurs du formulaire
-        id: item._id,
-        nom: item.nom,
-        email: item.email,
-        telephone: item.telephone
+        id : item._id,
+        prestationsId : item.prestationsId,
+        marque : item.voiture,
+        dateIntervention : localDateTime,
+        description : item.description,
+        clientId : item.clientId._id
       });
     }
-  
+
     getInterventions(): void {
-      this.interventionService.getInterventions(this.recherche, this.page).subscribe({
-        next: (data :any ) => {
-          this.interventions = data.data;
-          console.log('interventions ==>',data.data);
-          this.pagination = data.pagination;
-          setTimeout(() => {
+      if (this.role == this.env.role.mecanicien){
+        this.interventionService.getInterventionsByMecanicien(this.recherche, this.page).subscribe({
+          next: (data :any ) => {
+            this.interventions = data.data;
+            console.log('interventions ==>',data.data);
+            this.pagination = data.pagination;
+            setTimeout(() => {
             initFlowbite();
           }, 500);
         },
-        error: (error) => {
-          this.toastr.error(error.error.message, 'Erreur')
-        }
-      });
+            error: (error) => {
+            this.toastr.error(error.error.message, 'Erreur')
+          }
+        });
+      }else if (this.role == this.env.role.client){
+        this.interventionService.getInterventionsByClient(this.recherche, this.page).subscribe({
+          next: (data :any ) => {
+            this.interventions = data.data;
+            console.log('interventions ==>',data.data);
+            this.pagination = data.pagination;
+            setTimeout(() => {
+            initFlowbite();
+          }, 500);
+          },
+          error: (error) => {
+            this.toastr.error(error.error.message, 'Erreur')
+          }
+        })
+      }else{
+        this.interventionService.getInterventions(this.recherche, this.page).subscribe({
+          next: (data :any ) => {
+            this.interventions = data.data;
+            console.log('interventions ==>',data.data);
+            this.pagination = data.pagination;
+            setTimeout(() => {
+            initFlowbite();
+          }, 500);
+          },
+          error: (error) => {
+            this.toastr.error(error.error.message, 'Erreur')
+          }
+        })
+      }
     }
-  
-  
+
+
     onSearchChange(event: any): void {
       this.recherche = event.target.value;
       this.getInterventions();
     }
-  
+
     goToPreviousPage() {
       if (this.page > 1) {
         this.page--;
         this.getInterventions();
       }
     }
-  
+
     goToNextPage() {
       if (this.page < this.pagination.totalPages) {
         this.page++;
@@ -276,7 +379,7 @@ export class InterventionComponent {
       }
     }
 
-    
+
 
 
 

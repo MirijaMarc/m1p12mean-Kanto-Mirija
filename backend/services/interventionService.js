@@ -42,7 +42,7 @@ const getInterventionsDetails = async (skip, limit) => {
         return {
           ...intervention.toObject(),
           labelStatut,
-          prestations,
+          prestationsId : prestations,
           mecaniciens,
           client,
         };
@@ -80,8 +80,8 @@ const getInterventionsDetailsByClient = async (clientId, skip, limit) => {
         return {
           ...intervention.toObject(),
           labelStatut,
-          prestations,
-          mecaniciens,
+          prestationsId : prestations,
+          mecaniciensId : mecaniciens,
         };
       })
     );
@@ -92,6 +92,57 @@ const getInterventionsDetailsByClient = async (clientId, skip, limit) => {
       "Erreur lors de la récupération des détails des interventions:",
       error
     );
+    throw error;
+  }
+};
+
+
+const getAllInterventionsDetailsByClient = async (clientId) => {
+  try {
+    const interventions = await Intervention.find({
+      clientId: clientId,
+      deletedAt: null,
+    });
+    const interventionsDetails = await Promise.all(
+      interventions.map(async (intervention) => {
+        const labelStatut = Intervention.getLabelStatut(intervention.statut);
+        const prestations = await getPrestationsByIds(intervention.prestationsId);
+        const client = await Utilisateur.findById(intervention.clientId).select("-motDePasse");
+        return {
+          ...intervention.toObject(),
+          labelStatut,
+          prestationsId : prestations,
+          client,
+        };
+      })    
+    );
+    return interventionsDetails;
+  } catch (error) {
+    throw error;
+  }
+};  
+
+const getAllInterventionsDetailsByMecanicien = async (mecanicienId) => {
+  try {
+      const interventions = await Intervention.find({
+      mecaniciensId: { $in: [mecanicienId] },
+      deletedAt: null,
+    });
+    const interventionsDetails = await Promise.all(
+      interventions.map(async (intervention) => {
+        const labelStatut = Intervention.getLabelStatut(intervention.statut);
+        const prestations = await getPrestationsByIds(intervention.prestationsId);
+        const client = await Utilisateur.findById(intervention.clientId).select("-motDePasse"); 
+        return {
+          ...intervention.toObject(),
+          labelStatut,
+          prestationsId : prestations,
+          client,
+        };
+      })
+    );
+    return interventionsDetails;
+  } catch (error) {
     throw error;
   }
 };
@@ -118,7 +169,7 @@ const getInterventionsDetailsByMecanicien = async (mecanicienId, skip, limit) =>
         return {
           ...intervention.toObject(),
           labelStatut,
-          prestations,
+          prestationsId : prestations,
           client,
         };
       })
@@ -319,8 +370,10 @@ const getTotalPrestationsParJour = async () => {
   }
 };
 
-const getTotalPrestationsParType = async () => {
+const getTotalPrestationsParType = async (annee) => {
   try {
+    const year = (annee ?? new Date().getFullYear()).toString();
+
     const nbTotalPrestationsParType = await Prestation.aggregate([
       {
         $match: { deletedAt: null },
@@ -340,12 +393,33 @@ const getTotalPrestationsParType = async () => {
         },
       },
       {
+        $addFields: {
+          interventionYear: {
+            $cond: [
+              { $ifNull: ["$interventions.dateIntervention", false] },
+              { $year: "$interventions.dateIntervention" },
+              null
+            ]
+          }
+        }
+      },
+      {
         $match: {
-          $or: [
-            { "interventions.statut": { $ne: 3 } },
-            { interventions: { $exists: false } },
-          ],
-        },
+          $and: [
+            {
+              $or: [
+                { "interventions.statut": { $ne: 3 } },
+                { interventions: { $exists: false } },
+              ]
+            },
+            {
+              $or: [
+                { interventionYear: parseInt(year) },
+                { interventionYear: null }
+              ]
+            }
+          ]
+        }
       },
       {
         $group: {
@@ -368,10 +442,7 @@ const getTotalPrestationsParType = async () => {
 
     return nbTotalPrestationsParType;
   } catch (error) {
-    console.error(
-      "Erreur lors de la récupération du nombre de prestations",
-      error
-    );
+    console.error("Erreur lors de la récupération du nombre de prestations", error);
     throw error;
   }
 };
@@ -513,7 +584,6 @@ const getTotalInterventionsRealisees = async (annee = null) => {
 const getTotalInterventionsParMois = async (annee = null) => {
   try {
     let matchCondition = { deletedAt: null,  statut: { $ne: 3 }, };
-
     if (annee) {
       matchCondition.dateIntervention = {
         $gte: new Date(`${annee}-01-01T00:00:00.000Z`),
@@ -584,4 +654,6 @@ module.exports = {
   getTotalMontantInterventionsParMois,
   getTotalInterventionsRealisees,
   getTotalInterventionsParMois,
+  getAllInterventionsDetailsByClient,
+  getAllInterventionsDetailsByMecanicien
 };
