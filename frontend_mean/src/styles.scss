@@ -5,9 +5,18 @@
 @import "../node_modules/angular-calendar/css/angular-calendar.css";
 @import "primeicons/primeicons.css";
 
+// regular style toast
+@import 'ngx-toastr/toastr';
 
 
 .active{
     --tw-bg-opacity: 1;
     background-color: rgb(55 65 81 / var(--tw-bg-opacity, 1)); /* #374151 */
 }
+
+.apexcharts-canvas .apexcharts-legend-text {
+  font-size: 14px !important;
+  color: black !important;
+  font-weight: 500 !important;
+}
+

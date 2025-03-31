@@ -1,5 +1,6 @@
 const Intervention = require("../models/Intervention");
 const Prestation = require("../models/Prestation");
+const Voiture = require("../models/Voiture");
 const {
   getInterventionDetailsById,
   getProchaineInterventionDB,
@@ -12,27 +13,42 @@ const {
   getTotalPrestationsParType,
   calculMontantIntervention,
   getTotalMontantInterventions,
+  getTotalMontantInterventionsParMois,
+  getTotalInterventionsRealisees,
+  getTotalInterventionsParMois,
+  getAllInterventionsDetailsByClient,
+  getAllInterventionsDetailsByMecanicien
 } = require("../services/interventionService");
+const { newNotification } = require("../services/notificationService");
 const { decodeToken } = require("../utils/jwt");
 
 const newIntervention = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    const clientId = decodeToken(token);
-    const { prestationsId, voiture, dateIntervention, description } = req.body;
-    if (voiture._id) {
-      voitureInfo = { _id: voiture._id, marque: voiture.marque };
-    } else {
-      voitureInfo = { marque: voiture.marque };
+    console.log('token ==>', token);
+    var utilisateurId = decodeToken(token);
+    console.log('utilisateurId ==>', utilisateurId);
+
+    const { prestationsId, marque, dateIntervention, description, clientId = undefined } =
+      req.body;
+    let voiture = await Voiture.findOne({ marque });
+    if (!voiture) {
+      voiture = new Voiture({ marque });
+      await voiture.save();
     }
+
+    if (clientId) {
+      utilisateurId = clientId;
+    }
+
     const intervention = new Intervention({
       prestationsId,
-      voiture: voitureInfo,
+      voiture,
       dateIntervention,
       description,
-      clientId,
+      clientId: utilisateurId,
       statut: 1,
-      montant: await calculMontantIntervention(prestationsId)
+      montant: await calculMontantIntervention(prestationsId),
     });
     await intervention.save();
     res.status(201).json({
@@ -41,6 +57,8 @@ const newIntervention = async (req, res) => {
       data: intervention,
     });
   } catch (error) {
+    console.log(error);
+    
     res.status(400).json({
       statut: "error",
       message: error.message,
@@ -49,10 +67,113 @@ const newIntervention = async (req, res) => {
   }
 };
 
+
+
+
+const getAllInterventions = async (req, res) => {
+  try {
+    const interventions = await Intervention.find({ deletedAt: null })
+    .populate({
+      path: "clientId",
+      select: "nom prenom email",
+      as : "client"
+    })
+    .populate({
+      path: "prestationsId",
+      select: "label",
+      as: "prestations",
+    })
+    .populate({
+      path: "mecaniciensId",
+      select: "nom prenom email",
+      as: "mecaniciens",
+    });
+    res.json({
+      statut: "success",
+      message: "Interventions récupérées avec succès",
+      data: interventions,
+    });
+  } catch (error) { 
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+
 const getInterventions = async (req, res) => {
   try {
-    const interventions = await getInterventionsDetails();
+    const { recherche, page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+
+    const totalInterventions = await Intervention.countDocuments({ deletedAt: null });
+    const interventions = await Intervention.find({ deletedAt: null })
+      .populate({
+        path: "clientId",
+        select: "nom prenom email",
+        as : "client"
+      })
+      .populate({
+        path: "prestationsId",
+        select: "label",
+        as: "prestations",
+      })
+      .populate({
+        path: "mecaniciensId",
+        select: "nom prenom email",
+        as: "mecaniciens",
+      })
+      .sort({ dateIntervention: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
     res.json({
+      statut: "success",
+      message: "Interventions récupérées avec succès",
+      data: interventions,
+      pagination: {
+        total: totalInterventions,
+        page: Number(page),
+        totalPages: Math.ceil(totalInterventions / limit),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getAllInterventionsByClient = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const clientId = decodeToken(token);
+    const interventions = await getAllInterventionsDetailsByClient(clientId);
+    res.json({
+      statut: "success",
+      message: "Interventions récupérées avec succès",
+      data: interventions,
+    });
+  } catch (error) { 
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });   
+  }
+};
+
+const getAllInterventionsByMecanicien = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const mecanicienId = decodeToken(token);
+    const interventions = await getAllInterventionsDetailsByMecanicien(mecanicienId);
+    res.json({  
       statut: "success",
       message: "Interventions récupérées avec succès",
       data: interventions,
@@ -70,11 +191,26 @@ const getInterventionsByClient = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
     const clientId = decodeToken(token);
-    const interventions = await getInterventionsDetailsByClient(clientId);
+
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const totalInterventions = await Intervention.countDocuments({
+      clientId: clientId,
+      deletedAt: null,
+    });
+
+    const interventions = await getInterventionsDetailsByClient(clientId, skip, limit);
+
     res.json({
       statut: "success",
       message: "Interventions récupérées avec succès",
       data: interventions,
+      pagination: {
+        total: totalInterventions,
+        page: Number(page),
+        totalPages: Math.ceil(totalInterventions / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -85,17 +221,30 @@ const getInterventionsByClient = async (req, res) => {
   }
 };
 
+
 const getInterventionsByMecanicien = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
     const mecanicienId = decodeToken(token);
-    const interventions = await getInterventionsDetailsByMecanicien(
-      mecanicienId
-    );
+    const { page = 1, limit = 3 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const totalInterventions = await Intervention.countDocuments({
+      mecaniciensId: { $in: [mecanicienId] },
+      deletedAt: null,
+    });
+
+    const interventions = await getInterventionsDetailsByMecanicien(mecanicienId, skip, limit);
+
     res.json({
       statut: "success",
       message: "Interventions récupérées avec succès",
       data: interventions,
+      pagination: {
+        total: totalInterventions,
+        page: Number(page),
+        totalPages: Math.ceil(totalInterventions / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -105,6 +254,7 @@ const getInterventionsByMecanicien = async (req, res) => {
     });
   }
 };
+
 
 const getInterventionById = async (req, res) => {
   try {
@@ -167,7 +317,8 @@ const getNbInterventionByStatut = async (req, res) => {
 
 const getNbTotalPrestations = async (req, res) => {
   try {
-    const nbTotalPrestations = await getTotalPrestations();
+    const { annee } = req.query;
+    const nbTotalPrestations = await getTotalPrestations(annee);
     res.json({
       statut: "success",
       message: "Nombre total de prestations récupéré avec succès",
@@ -182,12 +333,81 @@ const getNbTotalPrestations = async (req, res) => {
   }
 };
 
-const getMontantTotalPrestations = async (req, res) => {
+const getMontantTotalInterventions = async (req, res) => {
   try {
-    const nbTotalPrestations = await getTotalMontantInterventions();
+    const { annee } = req.query;
+    const nbTotalPrestations = await getTotalMontantInterventions(annee);
     res.json({
       statut: "success",
-      message: "Nombre total de prestations récupéré avec succès",
+      message: "Montant total des interventions récupéré avec succès",
+      data: { nbTotalPrestations },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getMontantTotalInterventionsParMois = async (req, res) => {
+  try {
+    const { annee } = req.query;
+
+    const totalMontant = await getTotalMontantInterventionsParMois(annee);
+
+    return res.status(200).json({
+      statut: "success",
+      message: "Montant total des interventions par mois récupéré avec succès",
+      data: totalMontant,
+    });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des montants des interventions",
+      error
+    );
+    return res.status(500).json({
+      statut: "error",
+      message:
+        "Erreur serveur lors de la récupération des montants des interventions",
+      data: null,
+    });
+  }
+};
+
+const getNbTotalInterventionsParMois = async (req, res) => {
+  try {
+    const { annee } = req.query;
+
+    const totalMontant = await getTotalInterventionsParMois(annee);
+
+    return res.status(200).json({
+      statut: "success",
+      message: "Nombre total des interventions par mois récupéré avec succès",
+      data: totalMontant,
+    });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération du nombre des interventions",
+      error
+    );
+    return res.status(500).json({
+      statut: "error",
+      message:
+        "Erreur serveur lors de la récupération du nombre des interventions",
+      data: null,
+    });
+  }
+};
+
+const getNbTotalInterventionsRealisees = async (req, res) => {
+  try {
+    const { annee } = req.query;
+    const nbTotalPrestations = await getTotalInterventionsRealisees(annee);
+    res.json({
+      statut: "success",
+      message: "Nombre total des interventions récupéré avec succès",
       data: { nbTotalPrestations },
     });
   } catch (error) {
@@ -218,7 +438,8 @@ const getNbTotalPrestationsParJour = async (req, res) => {
 
 const getNbTotalPrestationsParType = async (req, res) => {
   try {
-    const nbTotalPrestationsParType = await getTotalPrestationsParType();
+    const { annee } = req.query;
+    const nbTotalPrestationsParType = await getTotalPrestationsParType(annee);
     res.json({
       statut: "success",
       message: "Nombre total de prestations récupéré avec succès",
@@ -244,7 +465,11 @@ const assignerMecaniciensIntervention = async (req, res) => {
         data: null,
       });
     }
+    console.log(mecaniciensId, 'mecaniciensId');
+    
     intervention.mecaniciensId = mecaniciensId;
+    console.log(intervention, 'intervention');
+    
     await intervention.save();
     res.json({
       statut: "success",
@@ -298,6 +523,10 @@ const commencerIntervention = async (req, res) => {
     }
     intervention.statut = 2;
     await intervention.save();
+    await newNotification(
+      intervention.clientId,
+      "Début de l'intervention sur votre voiture"
+    );
     res.json({
       statut: "success",
       message: "Intervention commencée avec succès",
@@ -324,6 +553,10 @@ const terminerIntervention = async (req, res) => {
     }
     intervention.statut = 4;
     await intervention.save();
+    await newNotification(
+      intervention.clientId,
+      "Intervention terminée - Votre voiture est prete"
+    );
     res.json({
       statut: "success",
       message: "Intervention terminée avec succès",
@@ -411,5 +644,11 @@ module.exports = {
   getNbTotalPrestations,
   getNbTotalPrestationsParJour,
   getNbTotalPrestationsParType,
-  getTotalMontantInterventions
+  getMontantTotalInterventions,
+  getNbTotalInterventionsRealisees,
+  getMontantTotalInterventionsParMois,
+  getNbTotalInterventionsParMois,
+  getAllInterventionsByClient,
+  getAllInterventionsByMecanicien,
+  getAllInterventions
 };

@@ -2,42 +2,27 @@
 
 <div date-rangepicker class="flex items-center justify-start gap-4 mt-5">
   <form class="max-w-sm flex items-center">
-    <select id="countries" class="h-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-      <option selected>Choisir une année</option>
-      <option *ngFor="let num of [].constructor(11); let i = index" value="US">{{ i }}</option>
+    <select (change)="onAnneeChange($event)" id="countries" class="h-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      <option *ngFor="let annee of annees" [value]="annee">
+        {{ annee }}
+      </option>
+
     </select>
   </form>
-  <div class="relative flex items-center ml-20">
-    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-        </svg>
-    </div>
-    <input id="datepicker-range-start" name="start" type="text" class="h-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date start">
-  </div>
-  <span class="mx-1 text-gray-500">à</span>
-  <div class="relative flex items-center">
-    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-        </svg>
-    </div>
-    <input id="datepicker-range-end" name="end" type="text" class="h-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date end">
-  </div>
 </div>
 
 <div class="flex justify-start gap-6 mt-10">
   <div class="sm:min-w-64 w-[500px] h-32 bg-white border border-gray-200 rounded-lg shadow-md p-6 flex flex-col dark:bg-gray-800 dark:border-gray-700">
     <h3 class="text-sm font-normal text-gray-900 dark:text-white mb-2">Nombre d'interventions réalisées</h3>
-    <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">150</p>
+    <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">{{ dashboardCardData.nbInterventionRealise }}</p>
   </div>
   <div class="sm:min-w-64 w-[500px] h-32 bg-white border border-gray-200 rounded-lg shadow-md p-6 flex flex-col dark:bg-gray-800 dark:border-gray-700">
     <h3 class="text-sm font-normal text-gray-900 dark:text-white mb-2">Chiffre d'affaire</h3>
-    <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">1 200 000 €</p>
+    <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">{{ dashboardCardData.chiffreAffaire | number:'1.0-0' }} Ar</p>
   </div>
   <div class="sm:min-w-64 w-[500px] h-32 bg-white border border-gray-200 rounded-lg shadow-md p-6 flex flex-col dark:bg-gray-800 dark:border-gray-700">
     <h3 class="text-sm font-normal text-gray-900 dark:text-white mb-2">Nombre de clients</h3>
-    <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">75</p>
+    <p class="text-4xl font-bold text-blue-600 dark:text-blue-400">{{ dashboardCardData.nombreClient }}</p>
   </div>
 </div>
 
@@ -46,30 +31,35 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <!-- Graphique Bar -->
-    <div class="bg-white p-6 shadow-lg rounded-xl min-h-[300px]">
+    <div class="bg-white p-6 shadow-lg rounded-xl min-h-[300px]" *ngIf="InterventionbBarChartOptions">
       <apx-chart
-        [series]="InterventionbBarChartOptions.series"
-        [chart]="InterventionbBarChartOptions.chart!"
-        [title]="InterventionbBarChartOptions.title!"
-        [xaxis]="InterventionbBarChartOptions.xaxis!"
-        [dataLabels]="InterventionbBarChartOptions.dataLabels!">
+        [series]="InterventionbBarChartOptions!.series!"
+        [chart]="InterventionbBarChartOptions!.chart!"
+        [title]="InterventionbBarChartOptions!.title!"
+        [xaxis]="InterventionbBarChartOptions!.xaxis!"
+        [dataLabels]="InterventionbBarChartOptions!.dataLabels!"
+        [legend]="InterventionbBarChartOptions!.legend!"
+        [fill]="InterventionbBarChartOptions!.fill!"
+        [yaxis]="InterventionbBarChartOptions!.yaxis!"
+        >
       </apx-chart>
     </div>
 
     <!-- Graphique Pie -->
-    <div class="bg-white p-6 shadow-lg rounded-xl min-h-[300px]">
+    <div class="bg-white p-6 shadow-lg rounded-xl min-h-[300px]" *ngIf="pieChartOptions">
       <apx-chart
         [series]="pieChartOptions.series"
         [chart]="pieChartOptions.chart!"
         [title]="pieChartOptions.title!"
-        [labels]="pieChartOptions.labels!">
+        [labels]="pieChartOptions.labels!"
+        [tooltip]="pieChartOptions.tooltip!">
       </apx-chart>
     </div>
 
   </div>
 
   <!-- Graphique supplémentaire sur une ligne entière -->
-  <div class="bg-white p-6 shadow-lg rounded-xl mt-6 min-h-[300px]">
+  <div class="bg-white p-6 shadow-lg rounded-xl mt-6 min-h-[300px]" *ngIf="CAChartOptions">
     <apx-chart
       [series]="CAChartOptions.series"
       [chart]="CAChartOptions.chart!"
@@ -78,5 +68,9 @@
       [dataLabels]="CAChartOptions.dataLabels!">
     </apx-chart>
   </div>
+
+
+
+
 </div>
 

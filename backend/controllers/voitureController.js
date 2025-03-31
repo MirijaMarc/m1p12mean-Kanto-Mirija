@@ -20,7 +20,7 @@ const createVoiture = async (req, res) => {
 
 const getVoitures = async (req, res) => {
   try {
-    const { recherche } = req.query;
+    const { recherche, page = 1, limit = 10 } = req.query;
     let condition = { deletedAt: null };
 
     if (recherche) {
@@ -30,7 +30,40 @@ const getVoitures = async (req, res) => {
       };
     }
 
-    const voitures = await Voiture.find(condition);
+    const skip = (page - 1) * limit;
+    const voitures = await Voiture.find(condition)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalVoitures = await Voiture.countDocuments(condition);
+
+    res.json({
+      statut: "success",
+      message: "Voitures récupérées avec succès",
+      data: voitures,
+      pagination: {
+        total: totalVoitures,
+        page: Number(page),
+        totalPages: Math.ceil(totalVoitures / limit),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      statut: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getAllVoitures = async (req, res) => {
+  try {
+    let condition = { deletedAt: null };
+
+    const voitures = await Voiture.find(condition)
+
+    const totalVoitures = await Voiture.countDocuments(condition);
+
     res.json({
       statut: "success",
       message: "Voitures récupérées avec succès",
@@ -44,6 +77,8 @@ const getVoitures = async (req, res) => {
     });
   }
 };
+
+
 
 const getVoitureById = async (req, res) => {
   try {
@@ -127,4 +162,5 @@ module.exports = {
   getVoitureById,
   updateVoiture,
   deleteVoiture,
+  getAllVoitures
 };

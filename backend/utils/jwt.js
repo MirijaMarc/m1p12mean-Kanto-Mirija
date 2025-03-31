@@ -18,7 +18,7 @@ const generateToken = (utilisateur) => {
 const decodeToken = (token) => {
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    return decodedToken.id;
+    return decodedToken.utilisateur.id;
   } catch (error) {
     throw new Error("Token invalide ou expiré");
   }

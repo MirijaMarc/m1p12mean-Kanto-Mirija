@@ -7,6 +7,7 @@ export default interface Prestation {
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
+    tarifRecent: number
 }
 
 interface Tarif {
