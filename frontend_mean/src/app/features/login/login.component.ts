@@ -34,8 +34,8 @@ export class LoginComponent {
     private toastr: ToastrService
   ) {
     this.loginForm = this.fb.group({
-      email: new FormControl(''),
-      motDePasse: new FormControl('')
+      email: new FormControl('admin@gmail.com'),
+      motDePasse: new FormControl('root')
     });
   }
 
