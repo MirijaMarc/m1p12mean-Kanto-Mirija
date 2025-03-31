@@ -126,6 +126,7 @@ const getInterventions = async (req, res) => {
         select: "nom prenom email",
         as: "mecaniciens",
       })
+      .sort({ dateIntervention: -1 })
       .skip(skip)
       .limit(Number(limit));
 
