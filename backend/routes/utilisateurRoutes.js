@@ -15,23 +15,23 @@ const {
   getAllMecaniciens,
   getAllClients,
 } = require("../controllers/utilisateurController");
+const { verifyRole } = require("../utils/jwt");
 
 const router = express.Router();
 
-router.post("/new", newUtilisateur);
+router.post("/new", verifyRole([3]), newUtilisateur);
 router.post("/connexion", connexion);
-router.get("/mecaniciens", getMecaniciens);
-router.get("/all-mecaniciens", getAllMecaniciens);
-router.get("/clients", getClients);
-router.get("/all-clients", getAllClients);
-router.get("/clients/total", getNbClients);
-router.patch("/:id/set-mecanicien", setRoleMecanicien);
-router.patch("/:id/set-manager", setRoleManager);
+router.get("/mecaniciens", verifyRole([3]), getMecaniciens);
+router.get("/all-mecaniciens", verifyRole([3]), getAllMecaniciens);
+router.get("/clients", verifyRole([3]), getClients);
+router.get("/all-clients", verifyRole([3]), getAllClients);
+router.get("/clients/total", verifyRole([3]), getNbClients);
+router.patch("/:id/set-mecanicien", verifyRole([3]), setRoleMecanicien);
+router.patch("/:id/set-manager", verifyRole([3]), setRoleManager);
 router.post("/", inscription);
-router.get("/", getUtilisateurs);
+router.get("/", verifyRole([3]), getUtilisateurs);
 router.get("/:id", getUtilisateurById);
-router.put("/:id", updateUtilisateur);
-router.delete("/:id", deleteUtilisateur);
-// router.get("/clients/total", verifyRole([1, 3]), getNbClients);
+router.put("/:id", verifyRole([3]), updateUtilisateur);
+router.delete("/:id", verifyRole([3]), deleteUtilisateur);
 
 module.exports = router;

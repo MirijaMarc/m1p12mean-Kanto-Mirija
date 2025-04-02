@@ -8,10 +8,11 @@ const {
   toutMarquerLuNotification,
   getNotifications,
 } = require("../controllers/notificationController");
+const { verifyRole } = require("../utils/jwt");
 
 const router = express.Router();
 
-router.get("/", getNotifications);
+router.get("/", verifyRole([3]), getNotifications);
 router.get("/utilisateurs/:utilisateurId", getNotificationsByUtilisateur);
 router.patch("/:id/lue", marquerLuNotification);
 router.patch("/utilisateurs/:utilisateurId/lues", toutMarquerLuNotification);

@@ -7,14 +7,15 @@ const {
   deletePrestation,
   getAllPrestations,
 } = require("../controllers/prestationController");
+const { verifyRole } = require("../utils/jwt");
 
 const router = express.Router();
 
-router.post("/", createPrestation);
-router.get("/", getPrestations);
-router.get("/all", getAllPrestations);
-router.get("/:id", getPrestationById);
-router.put("/:id", updatePrestation);
-router.delete("/:id", deletePrestation);
+router.post("/", verifyRole([3]), createPrestation);
+router.get("/", verifyRole([3]), getPrestations);
+router.get("/all", verifyRole([3]), getAllPrestations);
+router.get("/:id", verifyRole([3]), getPrestationById);
+router.put("/:id", verifyRole([3]), updatePrestation);
+router.delete("/:id", verifyRole([3]), deletePrestation);
 
 module.exports = router;
