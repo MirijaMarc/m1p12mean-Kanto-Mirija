@@ -11,11 +11,11 @@ const { verifyRole } = require("../utils/jwt");
 
 const router = express.Router();
 
-router.post("/", verifyRole([3]), createVoiture);
-router.get("/", verifyRole([3]), getVoitures);
-router.get("/all", verifyRole([3]), getAllVoitures);
-router.get("/:id", verifyRole([3]), getVoitureById);
-router.put("/:id", verifyRole([3]), updateVoiture);
-router.delete("/:id", verifyRole([3]), deleteVoiture);
+router.post("/", createVoiture);
+router.get("/", getVoitures);
+router.get("/all", getAllVoitures);
+router.get("/:id", getVoitureById);
+router.put("/:id", updateVoiture);
+router.delete("/:id", deleteVoiture);
 
 module.exports = router;
