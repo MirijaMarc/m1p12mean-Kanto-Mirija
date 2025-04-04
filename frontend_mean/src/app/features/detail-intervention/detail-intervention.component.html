@@ -68,7 +68,7 @@
 
   </div>
 
-  <div *ngIf="role == env.role.manager" class="flex justify-end mt-12 gap-3">
+  <div *ngIf="role == env.role.manager || role == env.role.mecanicien" class="flex justify-end mt-12 gap-3">
     <button (click)="terminerIntervention()" *ngIf="intervention.statut == 2" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-all shadow-md text-lg">
       Terminer
     </button>
