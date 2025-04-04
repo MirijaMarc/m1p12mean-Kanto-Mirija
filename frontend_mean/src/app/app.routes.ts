@@ -25,7 +25,7 @@ export const routes: Routes = [
       component: LayoutComponent,
       canActivate: [authGuard],
       children: [
-        { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+        { path: '', redirectTo: 'intervention', pathMatch: 'full' },
         { path: 'intervention', component: InterventionComponent },
         { path: 'dashboard', component: DashboardComponent, data: { expectedRole: ['manager'] }, canActivate: [roleGuard] },
         { path: 'calendrier', component: CalendrierComponent },
