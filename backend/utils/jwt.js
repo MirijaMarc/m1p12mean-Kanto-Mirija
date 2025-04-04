@@ -8,7 +8,7 @@ const generateToken = (utilisateur) => {
     email: utilisateur.email,
     role: utilisateur.role,
   }
-  
+
   return jwt.sign(
     { utilisateur: utilisateurDTO },
     process.env.JWT_SECRET,
@@ -31,7 +31,7 @@ const verifyRole = (allowedRoles) => {
     if (!token) {
       return res
         .status(401)
-        .json({ statut: "error", message: "Token manquant" });
+        .json({ statut: "error", message: "Vous devez vous connecter" });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
@@ -41,10 +41,10 @@ const verifyRole = (allowedRoles) => {
           .json({ statut: "error", message: "Token invalide" });
       }
 
-      if (!allowedRoles.includes(decoded.role)) {
+      if (!decoded.utilisateur.role.some(r => allowedRoles.includes(r.id))) {
         return res
           .status(403)
-          .json({ statut: "error", message: "Accès refusé, rôle insuffisant" });
+          .json({ statut: "error", message: "Accès refusé" });
       }
 
       req.user = decoded;
